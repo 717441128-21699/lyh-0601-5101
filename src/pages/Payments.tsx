@@ -15,21 +15,12 @@ interface Milestone {
   status: string
 }
 
-const mockData: Milestone[] = [
-  { id: 'FK-001', contractId: 'HT-2024-001', contractTitle: '办公电脑采购合同', supplier: '华信科技', milestoneName: '预付款(30%)', amount: 45000, dueDate: '2024-01-25', status: 'paid' },
-  { id: 'FK-002', contractId: 'HT-2024-001', contractTitle: '办公电脑采购合同', supplier: '华信科技', milestoneName: '到货款(50%)', amount: 75000, dueDate: '2024-02-15', status: 'payment_requested' },
-  { id: 'FK-003', contractId: 'HT-2024-001', contractTitle: '办公电脑采购合同', supplier: '华信科技', milestoneName: '质保金(20%)', amount: 30000, dueDate: '2024-07-20', status: 'pending' },
-  { id: 'FK-004', contractId: 'HT-2024-003', contractTitle: '空调设备维保合同', supplier: '格力电器', milestoneName: '首付款(50%)', amount: 160000, dueDate: '2024-02-05', status: 'paid' },
-  { id: 'FK-005', contractId: 'HT-2024-003', contractTitle: '空调设备维保合同', supplier: '格力电器', milestoneName: '尾款(50%)', amount: 160000, dueDate: '2024-03-05', status: 'pending' },
-  { id: 'FK-006', contractId: 'HT-2024-015', contractTitle: '网络设备升级合同', supplier: '华为技术', milestoneName: '预付款(40%)', amount: 224000, dueDate: '2024-02-01', status: 'payment_requested' },
-  { id: 'FK-007', contractId: 'HT-2024-015', contractTitle: '网络设备升级合同', supplier: '华为技术', milestoneName: '到货款(40%)', amount: 224000, dueDate: '2024-03-01', status: 'pending' },
-  { id: 'FK-008', contractId: 'HT-2024-015', contractTitle: '网络设备升级合同', supplier: '华为技术', milestoneName: '质保金(20%)', amount: 112000, dueDate: '2024-08-01', status: 'pending' },
-]
+const mockData: Milestone[] = []
 
 const statusFilters = [
   { key: '', label: '全部' },
   { key: 'pending', label: '待付款' },
-  { key: 'payment_requested', label: '已申请' },
+  { key: 'accepted', label: '已申请' },
   { key: 'paid', label: '已付款' },
 ]
 
@@ -38,7 +29,35 @@ export default function Payments() {
   const [statusFilter, setStatusFilter] = useState('')
 
   useEffect(() => {
-    apiFetch<Milestone[]>('/payments').then(setData).catch(() => setData(mockData))
+    apiFetch<any[]>('/payments')
+      .then((groups: any[]) => {
+        const flat: Milestone[] = []
+        groups.forEach((g) => {
+          const supplier = g.contract?.supplier_name || ''
+          const contractId = g.contract?.id || ''
+          const contractTitle = `${supplier}合同`
+          g.milestones?.forEach((m: any) => {
+            flat.push({
+              id: m.id,
+              contractId,
+              contractTitle,
+              supplier,
+              milestoneName: m.name,
+              amount: Number(m.amount),
+              dueDate: m.due_date || '',
+              status: m.status || 'pending',
+            })
+          })
+          g.payment_requests?.forEach((pr: any) => {
+            const existing = flat.find((x) => x.id === pr.milestone_id)
+            if (existing && pr.status === 'pending') {
+              existing.status = 'accepted'
+            }
+          })
+        })
+        if (flat.length) setData(flat.length ? flat : mockData)
+      })
+      .catch(() => setData(mockData))
   }, [])
 
   const filtered = data.filter((r) => !statusFilter || r.status === statusFilter)

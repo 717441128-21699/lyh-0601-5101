@@ -23,20 +23,32 @@ interface AcceptanceDetail {
 }
 
 const mockData: AcceptanceDetail = {
-  id: 'YS-2024-001',
-  contractId: 'HT-2024-001',
-  title: '办公电脑验收',
-  supplier: '华信科技',
-  amount: 150000,
+  id: '',
+  contractId: '',
+  title: '',
+  supplier: '',
+  amount: 0,
   status: 'pending_acceptance',
-  deliveryItems: [
-    { name: '品牌型号', ordered: '联想 ThinkCentre M930t', delivered: '联想 ThinkCentre M930t', match: true },
-    { name: 'CPU', ordered: 'Intel i5-13400', delivered: 'Intel i5-13400', match: true },
-    { name: '内存', ordered: '16GB DDR4', delivered: '16GB DDR4', match: true },
-    { name: '硬盘', ordered: '512GB SSD', delivered: '256GB SSD', match: false },
-    { name: '显示器', ordered: '23.8英寸 IPS', delivered: '23.8英寸 IPS', match: true },
-    { name: '数量', ordered: '30台', delivered: '28台', match: false },
-  ],
+  deliveryItems: [],
+}
+
+function mapAcceptanceStatus(s: string): string {
+  if (s === 'completed') return 'accepted'
+  return 'pending_acceptance'
+}
+
+function normalizeDeliveryItems(items: any[]): DeliveryItem[] {
+  if (!items || !items.length) {
+    return [
+      { name: '交付物核对', ordered: '合同约定清单', delivered: '供应商实际交付', match: true },
+    ]
+  }
+  return items.map((it) => ({
+    name: it.name || it.item || '检查项',
+    ordered: it.ordered || it.expected || it.requirement || '-',
+    delivered: it.delivered || it.actual || it.provided || '-',
+    match: typeof it.match === 'boolean' ? it.match : String(it.ordered || it.expected || '') === String(it.delivered || it.actual || ''),
+  }))
 }
 
 export default function AcceptanceDetail() {
@@ -49,7 +61,22 @@ export default function AcceptanceDetail() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    apiFetch<AcceptanceDetail>(`/acceptances/${id}`).then(setData).catch(() => {})
+    apiFetch<any>(`/acceptances/${id}`)
+      .then((raw: any) => {
+        const supplier = raw.contract?.supplier_name || ''
+        const msName = raw.milestone?.name || '验收'
+        const mapped: AcceptanceDetail = {
+          id: raw.id,
+          contractId: raw.contract_id,
+          title: `${supplier}${msName}`,
+          supplier,
+          amount: Number(raw.contract?.amount || raw.amount || 0),
+          status: mapAcceptanceStatus(raw.status),
+          deliveryItems: normalizeDeliveryItems(raw.delivery_items || []),
+        }
+        setData(mapped)
+      })
+      .catch(() => {})
   }, [id])
 
   const handleComplete = async () => {

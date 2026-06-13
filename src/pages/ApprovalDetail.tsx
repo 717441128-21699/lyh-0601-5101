@@ -27,20 +27,55 @@ interface ApprovalDetail {
 }
 
 const mockData: ApprovalDetail = {
-  id: 'SP-2024-001',
-  title: '办公电脑采购审批',
-  type: '采购审批',
-  amount: 150000,
+  id: '',
+  title: '',
+  type: '审批',
+  amount: 0,
   status: 'pending',
-  currentStep: 2,
-  totalSteps: 4,
-  createdAt: '2024-01-16',
-  steps: [
-    { step: 1, title: '部门主管', assignee: '王经理', status: 'completed', comment: '同意', completedAt: '2024-01-16 10:30' },
-    { step: 2, title: '采购部门', assignee: '李主管', status: 'current' },
-    { step: 3, title: '财务审批', assignee: '赵总监', status: 'pending' },
-    { step: 4, title: '总经理', assignee: '刘总', status: 'pending' },
-  ],
+  currentStep: 1,
+  totalSteps: 1,
+  createdAt: '',
+  steps: [],
+}
+
+const typeLabels: Record<string, string> = {
+  requirement: '采购审批',
+  contract: '合同审批',
+  payment: '付款审批',
+}
+const roleLabels: Record<string, string> = {
+  manager: '部门经理审批',
+  director: '总监理审批',
+}
+
+function mapApprovalDetail(a: any): ApprovalDetail {
+  const totalSteps = Array.isArray(a.steps) ? a.steps.length : (a.required_level === 'director' ? 2 : 1)
+  const typeLabel = typeLabels[a.type] || a.type || '审批'
+  const steps: ApprovalStep[] = (a.steps || []).map((s: any) => {
+    let stepStatus: 'completed' | 'current' | 'pending' = 'pending'
+    if (s.status === 'approved' || s.status === 'rejected') stepStatus = 'completed'
+    else if (s.step === a.current_step && a.status === 'pending') stepStatus = 'current'
+    const actedAt = s.acted_at ? s.acted_at.replace('T', ' ').slice(0, 16) : undefined
+    return {
+      step: s.step,
+      title: roleLabels[s.role] || `第${s.step}级审批`,
+      assignee: s.approver_name || '-',
+      status: stepStatus,
+      comment: s.comment || undefined,
+      completedAt: actedAt,
+    }
+  })
+  return {
+    id: a.id,
+    title: `${typeLabel} · ${a.related_id || a.id}`,
+    type: typeLabel,
+    amount: Number(a.amount || 0),
+    status: a.status || 'pending',
+    currentStep: Number(a.current_step || 1),
+    totalSteps,
+    createdAt: a.created_at ? a.created_at.slice(0, 10) : '',
+    steps,
+  }
 }
 
 export default function ApprovalDetail() {
@@ -53,7 +88,9 @@ export default function ApprovalDetail() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    apiFetch<ApprovalDetail>(`/approvals/${id}`).then(setData).catch(() => {})
+    apiFetch<any>(`/approvals/${id}`)
+      .then((raw) => setData(mapApprovalDetail(raw)))
+      .catch(() => {})
   }, [id])
 
   const handleAction = async (action: 'approved' | 'rejected') => {

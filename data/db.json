@@ -906,6 +906,16 @@
       "target_id": "XJ-17813864449254635",
       "detail": "创建询价: 员工工服定制询价",
       "timestamp": "2026-06-13T21:34:04.928Z"
+    },
+    {
+      "id": "log-17813875774651828",
+      "operator_id": "user-2",
+      "operator_name": "张经理",
+      "action": "用户登录",
+      "target_type": "user",
+      "target_id": "user-2",
+      "detail": "张经理登录系统",
+      "timestamp": "2026-06-13T21:52:57.465Z"
     }
   ],
   "alerts": [

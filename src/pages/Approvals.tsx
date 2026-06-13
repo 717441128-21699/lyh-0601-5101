@@ -17,14 +17,7 @@ interface Approval {
   createdAt: string
 }
 
-const mockData: Approval[] = [
-  { id: 'SP-2024-001', title: '办公电脑采购审批', type: '采购审批', amount: 150000, status: 'pending', currentStep: 2, totalSteps: 4, submittedBy: '张三', createdAt: '2024-01-16' },
-  { id: 'SP-2024-002', title: '实验室试剂审批', type: '采购审批', amount: 80000, status: 'pending', currentStep: 1, totalSteps: 3, submittedBy: '李四', createdAt: '2024-01-15' },
-  { id: 'SP-2024-003', title: '空调设备审批', type: '采购审批', amount: 320000, status: 'approved', currentStep: 4, totalSteps: 4, submittedBy: '王五', createdAt: '2024-01-14' },
-  { id: 'SP-2024-004', title: '合同HT-2024-015签署审批', type: '合同审批', amount: 560000, status: 'rejected', currentStep: 2, totalSteps: 3, submittedBy: '赵六', createdAt: '2024-01-13' },
-  { id: 'SP-2024-005', title: '付款申请FK-2024-007', type: '付款审批', amount: 95000, status: 'pending', currentStep: 1, totalSteps: 2, submittedBy: '钱七', createdAt: '2024-01-12' },
-  { id: 'SP-2024-006', title: '打印纸采购审批', type: '采购审批', amount: 25000, status: 'approved', currentStep: 3, totalSteps: 3, submittedBy: '孙八', createdAt: '2024-01-11' },
-]
+const mockData: Approval[] = []
 
 const tabs = [
   { key: 'pending', label: '待我审批' },
@@ -32,12 +25,40 @@ const tabs = [
   { key: '', label: '全部' },
 ]
 
+const typeLabels: Record<string, string> = {
+  requirement: '采购审批',
+  contract: '合同审批',
+  payment: '付款审批',
+}
+
+function approvalTitle(a: any): string {
+  const typeLabel = typeLabels[a.type] || '审批'
+  return `${typeLabel} · ${a.related_id || a.id}`
+}
+
+function mapApproval(a: any): Approval {
+  const totalSteps = Array.isArray(a.steps) ? a.steps.length : (a.required_level === 'director' ? 2 : 1)
+  return {
+    id: a.id,
+    title: approvalTitle(a),
+    type: typeLabels[a.type] || a.type || '审批',
+    amount: Number(a.amount || 0),
+    status: a.status || 'pending',
+    currentStep: Number(a.current_step || 1),
+    totalSteps,
+    submittedBy: a.steps?.[0]?.approver_name || '系统提交',
+    createdAt: a.created_at ? a.created_at.slice(0, 10) : '',
+  }
+}
+
 export default function Approvals() {
   const [data, setData] = useState<Approval[]>(mockData)
   const [activeTab, setActiveTab] = useState('pending')
 
   useEffect(() => {
-    apiFetch<Approval[]>('/approvals').then(setData).catch(() => setData(mockData))
+    apiFetch<any[]>('/approvals')
+      .then((list) => setData(list.map(mapApproval)))
+      .catch(() => setData(mockData))
   }, [])
 
   const filtered = data.filter((r) => !activeTab || r.status === activeTab)

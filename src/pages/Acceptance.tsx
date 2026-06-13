@@ -14,27 +14,42 @@ interface AcceptanceItem {
   deliveryDate: string
 }
 
-const mockData: AcceptanceItem[] = [
-  { id: 'YS-2024-001', contractId: 'HT-2024-001', title: '办公电脑验收', supplier: '华信科技', amount: 150000, status: 'pending_acceptance', deliveryDate: '2024-02-05' },
-  { id: 'YS-2024-002', contractId: 'HT-2024-002', title: '实验室试剂验收', supplier: '中联数码', amount: 80000, status: 'processing', deliveryDate: '2024-02-10' },
-  { id: 'YS-2024-003', contractId: 'HT-2024-003', title: '空调设备验收', supplier: '格力电器', amount: 320000, status: 'accepted', deliveryDate: '2024-02-01' },
-  { id: 'YS-2024-004', contractId: 'HT-2024-004', title: '打印纸验收', supplier: '得力文具', amount: 25000, status: 'accepted', deliveryDate: '2024-01-20' },
-  { id: 'YS-2024-012', contractId: 'HT-2024-015', title: '网络设备验收', supplier: '华为技术', amount: 560000, status: 'pending_acceptance', deliveryDate: '2024-02-15' },
-]
+const mockData: AcceptanceItem[] = []
 
 const tabs = [
   { key: '', label: '全部' },
   { key: 'pending_acceptance', label: '待验收' },
-  { key: 'processing', label: '验收中' },
   { key: 'accepted', label: '已验收' },
 ]
+
+function mapAcceptanceStatus(s: string): string {
+  if (s === 'completed') return 'accepted'
+  return 'pending_acceptance'
+}
 
 export default function Acceptance() {
   const [data, setData] = useState<AcceptanceItem[]>(mockData)
   const [activeTab, setActiveTab] = useState('')
 
   useEffect(() => {
-    apiFetch<AcceptanceItem[]>('/acceptances').then(setData).catch(() => setData(mockData))
+    apiFetch<any[]>('/acceptances')
+      .then((list: any[]) => {
+        const mapped: AcceptanceItem[] = list.map((a) => {
+          const supplier = a.contract?.supplier_name || ''
+          const msName = a.milestone?.name || '验收'
+          return {
+            id: a.id,
+            contractId: a.contract_id,
+            title: `${supplier}${msName}`,
+            supplier,
+            amount: Number(a.contract?.amount || a.amount || 0),
+            status: mapAcceptanceStatus(a.status),
+            deliveryDate: a.milestone?.due_date || (a.created_at ? a.created_at.slice(0, 10) : ''),
+          }
+        })
+        setData(mapped.length ? mapped : mockData)
+      })
+      .catch(() => setData(mockData))
   }, [])
 
   const filtered = data.filter((r) => !activeTab || r.status === activeTab)

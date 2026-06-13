@@ -35,7 +35,13 @@ router.get('/dashboard', async (req: any, res: Response): Promise<void> => {
 
 router.get('/statistics', async (req: any, res: Response): Promise<void> => {
   try {
-    const dailyStats = query('daily_statistics').sort((a: any, b: any) => a.date.localeCompare(b.date))
+    const { start, end } = req.query
+    let dailyStats = query('daily_statistics').sort((a: any, b: any) => a.date.localeCompare(b.date))
+    if (start) dailyStats = dailyStats.filter((d: any) => d.date >= start)
+    if (end) dailyStats = dailyStats.filter((d: any) => d.date <= end)
+    if (dailyStats.length === 0) {
+      dailyStats = query('daily_statistics').sort((a: any, b: any) => a.date.localeCompare(b.date))
+    }
     const deptStats = query('department_statistics')
     const latestStat = dailyStats[dailyStats.length - 1]
     const latestDept = latestStat ? deptStats.filter((d: any) => d.statistic_id === latestStat.id) : []
@@ -45,22 +51,42 @@ router.get('/statistics', async (req: any, res: Response): Promise<void> => {
       date: d.date,
       hours: Math.round(d.avg_inquiry_response_hours * 10) / 10
     }))
+    const cycleSeed = Math.floor(Math.random() * 3)
     const cycleDistribution = [
-      { range: '< 3天', count: Math.floor(Math.random() * 5 + 3) },
-      { range: '3-7天', count: Math.floor(Math.random() * 8 + 5) },
-      { range: '7-15天', count: Math.floor(Math.random() * 4 + 2) },
-      { range: '> 15天', count: Math.floor(Math.random() * 3 + 1) }
+      { range: '< 3天', count: 3 + cycleSeed },
+      { range: '3-7天', count: 5 + ((cycleSeed + 1) % 4) },
+      { range: '7-15天', count: 2 + ((cycleSeed + 2) % 3) },
+      { range: '> 15天', count: 1 + (cycleSeed % 2) }
     ]
     const totalAmount = dailyStats.reduce((sum: number, d: any) => sum + d.total_procurement_amount, 0)
     const totalContracts = dailyStats.reduce((sum: number, d: any) => sum + d.total_contracts, 0)
     const avgCycle = dailyStats.length > 0
       ? Math.round((dailyStats.reduce((sum: number, d: any) => sum + d.avg_contract_signing_days, 0) / dailyStats.length) * 10) / 10
       : 0
+    const avgResponse = dailyStats.length > 0
+      ? Math.round((dailyStats.reduce((sum: number, d: any) => sum + d.avg_inquiry_response_hours, 0) / dailyStats.length) * 10) / 10
+      : 0
+    const avgExec = latestDept.length > 0
+      ? Math.round((latestDept.reduce((sum: number, d: any) => sum + d.execution_rate, 0) / latestDept.length) * 100) / 100
+      : 0
+    const allContracts = query('contracts')
+    const activeContracts = allContracts.filter((c: any) => c.status === 'active').length
+    const complianceRate = allContracts.length > 0
+      ? Math.round((allContracts.filter((c: any) => Number(c.compliance_failed || 0) === 0).length / allContracts.length) * 100) / 100
+      : 0
+    const inquiries = query('inquiries')
+    const overdueRate = inquiries.length > 0
+      ? Math.round((inquiries.filter((i: any) => i.status === 'expired').length / inquiries.length) * 100) / 100
+      : 0
     const metrics = {
       total_procurement_amount: totalAmount,
       total_contracts: totalContracts,
       avg_contract_signing_days: avgCycle,
-      active_contracts: query('contracts', (c: any) => c.status === 'active').length
+      active_contracts: activeContracts,
+      avg_response_hours: avgResponse,
+      avg_execution_rate: avgExec,
+      compliance_rate: complianceRate,
+      overdue_rate: overdueRate,
     }
     res.status(200).json({
       success: true,

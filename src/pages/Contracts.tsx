@@ -17,14 +17,7 @@ interface Contract {
   endDate: string
 }
 
-const mockData: Contract[] = [
-  { id: 'HT-2024-001', title: '办公电脑采购合同', supplier: '华信科技', amount: 150000, status: 'active', signingStatus: 'signed', complianceStatus: 'passed', startDate: '2024-01-20', endDate: '2024-07-20' },
-  { id: 'HT-2024-002', title: '实验室试剂供应合同', supplier: '中联数码', amount: 80000, status: 'signing', signingStatus: 'pending', complianceStatus: 'checking', startDate: '2024-01-25', endDate: '2024-06-25' },
-  { id: 'HT-2024-003', title: '空调设备维保合同', supplier: '格力电器', amount: 320000, status: 'active', signingStatus: 'signed', complianceStatus: 'passed', startDate: '2024-02-01', endDate: '2025-01-31' },
-  { id: 'HT-2024-004', title: '打印纸供应合同', supplier: '得力文具', amount: 25000, status: 'completed', signingStatus: 'signed', complianceStatus: 'passed', startDate: '2023-06-01', endDate: '2024-01-15' },
-  { id: 'HT-2024-005', title: '安全监控设备合同', supplier: '海康威视', amount: 450000, status: 'draft', signingStatus: 'unsigned', complianceStatus: 'pending', startDate: '', endDate: '' },
-  { id: 'HT-2024-015', title: '网络设备升级合同', supplier: '华为技术', amount: 560000, status: 'active', signingStatus: 'signed', complianceStatus: 'warning', startDate: '2023-08-01', endDate: '2024-07-31' },
-]
+const mockData: Contract[] = []
 
 const tabs = [
   { key: '', label: '全部' },
@@ -38,13 +31,39 @@ const tabs = [
 const complianceLabels: Record<string, string> = { passed: '合规', checking: '校验中', pending: '待校验', warning: '有风险' }
 const signingLabels: Record<string, string> = { signed: '已签署', pending: '待签署', unsigned: '未签署' }
 
+function mapContract(c: any): Contract {
+  const supplier = c.supplier_name || ''
+  let signingStatus = 'unsigned'
+  if (c.signed_at) signingStatus = 'signed'
+  else if (c.effective_from || c.status === 'signing') signingStatus = 'pending'
+  let complianceStatus = 'pending'
+  const passed = Number(c.compliance_passed || 0)
+  const failed = Number(c.compliance_failed || 0)
+  if (passed > 0 && failed === 0) complianceStatus = 'passed'
+  else if (failed > 0) complianceStatus = 'warning'
+  else if (passed > 0 && failed > 0) complianceStatus = 'checking'
+  return {
+    id: c.id,
+    title: `${supplier}合同`,
+    supplier,
+    amount: Number(c.amount || 0),
+    status: c.status || 'draft',
+    signingStatus,
+    complianceStatus,
+    startDate: c.effective_from || '',
+    endDate: c.effective_to || '',
+  }
+}
+
 export default function Contracts() {
   const [data, setData] = useState<Contract[]>(mockData)
   const [activeTab, setActiveTab] = useState('')
   const [search, setSearch] = useState('')
 
   useEffect(() => {
-    apiFetch<Contract[]>('/contracts').then(setData).catch(() => setData(mockData))
+    apiFetch<any[]>('/contracts')
+      .then((list) => setData(list.map(mapContract)))
+      .catch(() => setData(mockData))
   }, [])
 
   const filtered = data.filter((r) => {

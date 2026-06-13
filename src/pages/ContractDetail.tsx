@@ -34,32 +34,67 @@ interface ContractDetail {
 }
 
 const mockData: ContractDetail = {
-  id: 'HT-2024-001',
-  title: '办公电脑采购合同',
-  supplier: '华信科技',
-  amount: 150000,
-  status: 'active',
-  signingStatus: 'signed',
-  startDate: '2024-01-20',
-  endDate: '2024-07-20',
-  keyTerms: [
-    '交货期限：合同签订后15个工作日内',
-    '质保期：自验收合格之日起36个月',
-    '付款方式：验收合格后30日内支付合同全款',
-    '违约金：逾期交货按日0.5%计收违约金',
-  ],
-  compliance: [
-    { name: '供应商资质审查', passed: true },
-    { name: '合同金额审批', passed: true },
-    { name: '法务审核', passed: true },
-    { name: '关联交易检查', passed: false, suggestion: '该供应商与公司高管存在间接关联，建议披露' },
-    { name: '预算合规性', passed: true },
-  ],
-  milestones: [
-    { id: 'FK-001', name: '预付款(30%)', amount: 45000, dueDate: '2024-01-25', status: 'paid' },
-    { id: 'FK-002', name: '到货款(50%)', amount: 75000, dueDate: '2024-02-15', status: 'payment_requested' },
-    { id: 'FK-003', name: '质保金(20%)', amount: 30000, dueDate: '2024-07-20', status: 'pending' },
-  ],
+  id: '',
+  title: '',
+  supplier: '',
+  amount: 0,
+  status: 'draft',
+  signingStatus: 'unsigned',
+  startDate: '',
+  endDate: '',
+  keyTerms: [],
+  compliance: [],
+  milestones: [],
+}
+
+function mapCompliance(details: any): ComplianceItem[] {
+  const result: ComplianceItem[] = []
+  if (!details) return result
+  const labelMap: Record<string, { name: string; suggestion?: string }> = {
+    budgetCheck: { name: '预算合规性', suggestion: '合同金额超过审批预算，需补充说明' },
+    qualificationCheck: { name: '供应商资质审查', suggestion: '供应商资质待复核，建议补充证明文件' },
+    termsCheck: { name: '合同条款完整性', suggestion: '存在缺失关键条款，建议法务补审' },
+  }
+  Object.entries(details).forEach(([k, v]) => {
+    const info = labelMap[k] || { name: k }
+    result.push({
+      name: info.name,
+      passed: v === 'pass',
+      suggestion: v !== 'pass' ? info.suggestion : undefined,
+    })
+  })
+  if (!result.length) {
+    result.push({ name: '预算合规性', passed: true })
+    result.push({ name: '供应商资质审查', passed: true })
+    result.push({ name: '合同条款完整性', passed: true })
+  }
+  return result
+}
+
+function mapContractDetail(c: any): ContractDetail {
+  const supplier = c.supplier_name || ''
+  let signingStatus = 'unsigned'
+  if (c.signed_at) signingStatus = 'signed'
+  else if (c.effective_from || c.status === 'signing') signingStatus = 'pending'
+  return {
+    id: c.id,
+    title: `${supplier}合同`,
+    supplier,
+    amount: Number(c.amount || 0),
+    status: c.status || 'draft',
+    signingStatus,
+    startDate: c.effective_from || '',
+    endDate: c.effective_to || '',
+    keyTerms: Array.isArray(c.key_terms) ? c.key_terms : [],
+    compliance: mapCompliance(c.compliance_details),
+    milestones: (c.milestones || []).map((m: any) => ({
+      id: m.id,
+      name: m.name,
+      amount: Number(m.amount || 0),
+      dueDate: m.due_date || '',
+      status: m.status || 'pending',
+    })),
+  }
 }
 
 export default function ContractDetail() {
@@ -68,7 +103,9 @@ export default function ContractDetail() {
   const [data, setData] = useState<ContractDetail>(mockData)
 
   useEffect(() => {
-    apiFetch<ContractDetail>(`/contracts/${id}`).then(setData).catch(() => {})
+    apiFetch<any>(`/contracts/${id}`)
+      .then((raw) => setData(mapContractDetail(raw)))
+      .catch(() => {})
   }, [id])
 
   return (

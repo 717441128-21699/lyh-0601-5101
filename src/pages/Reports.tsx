@@ -67,14 +67,26 @@ export default function Reports() {
         ? (json.responseTrend as any[]).map((r) => ({ month: r.date.slice(5), avgDays: Math.round((r.hours / 24) * 10) / 10 }))
         : undefined
       const cycleData = json.cycleDistribution
-      const executionRate = json.metrics ? Object.values(json.departmentRates || {}).reduce((a: number, b: any) => a + b, 0) / Math.max(1, Object.keys(json.departmentRates || {}).length) : undefined
-      const avgResponseTime = json.metrics ? undefined : undefined
+      const m = json.metrics || {}
+      const execFromMetrics = Number(m.avg_execution_rate)
+      const deptVals = Object.values(json.departmentRates || {}) as number[]
+      const avgDeptExec = deptVals.length
+        ? deptVals.reduce((a, b) => a + b, 0) / deptVals.length
+        : 0
+      const executionRate = execFromMetrics > 0 ? execFromMetrics : (avgDeptExec > 0 ? avgDeptExec : undefined)
+      const avgResponseDays = m.avg_response_hours
+        ? Math.round((m.avg_response_hours / 24) * 100) / 100
+        : undefined
+      const complianceRate = m.compliance_rate !== undefined ? Number(m.compliance_rate) : undefined
+      const overdueRate = m.overdue_rate !== undefined ? Number(m.overdue_rate) : undefined
       setStats({
         deptData,
         responseData,
         cycleData,
-        executionRate: executionRate ? Math.round(executionRate * 10) / 10 : undefined,
-        avgResponseTime,
+        executionRate,
+        avgResponseTime: avgResponseDays,
+        complianceRate,
+        overdueRate,
       })
     } catch (e: any) {
       showToast(e.message || '获取统计数据失败', 'error')
