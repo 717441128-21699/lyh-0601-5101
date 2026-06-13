@@ -20,7 +20,7 @@ export default function Login() {
       await login(username, password)
       navigate('/')
     } catch (err: any) {
-      setError(err.message || '登录失败，请检查用户名和密码')
+      setError(err.message || '用户名或密码错误')
     } finally {
       setLoading(false)
     }
@@ -87,6 +87,13 @@ export default function Login() {
               {loading ? '登录中...' : '登 录'}
             </button>
           </form>
+          <div className="mt-6 pt-5 border-t border-gray-100">
+            <p className="text-xs text-gray-500 mb-2 font-medium">测试账号：</p>
+            <div className="text-xs text-gray-400 space-y-1">
+              <p>admin / admin123 · manager / manager123 · procurement / procurement123</p>
+              <p>approver / approver123 · finance / finance123</p>
+            </div>
+          </div>
         </div>
         <p className="text-center text-primary-300 text-xs mt-6">© 2024 采管通 智慧采购管理系统</p>
       </div>

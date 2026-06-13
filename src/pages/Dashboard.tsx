@@ -75,7 +75,7 @@ export default function Dashboard() {
   })
 
   useEffect(() => {
-    apiFetch<DashboardData>('/dashboard').then(setData).catch(() => {})
+    apiFetch<DashboardData>('/reports/dashboard').then(setData).catch(() => {})
   }, [])
 
   const radius = 50

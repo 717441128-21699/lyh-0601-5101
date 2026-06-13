@@ -1,7 +1,3 @@
-/**
- * This is a API server
- */
-
 import express, {
   type Request,
   type Response,
@@ -11,14 +7,34 @@ import cors from 'cors'
 import path from 'path'
 import dotenv from 'dotenv'
 import { fileURLToPath } from 'url'
+import { getDB, DATA_DIR } from './database.js'
+import { authMiddleware } from './middleware/auth.js'
 import authRoutes from './routes/auth.js'
+import requirementRoutes from './routes/requirements.js'
+import inquiryRoutes from './routes/inquiries.js'
+import approvalRoutes from './routes/approvals.js'
+import contractRoutes from './routes/contracts.js'
+import acceptanceRoutes from './routes/acceptances.js'
+import paymentRoutes from './routes/payments.js'
+import supplierRoutes from './routes/suppliers.js'
+import reportRoutes from './routes/reports.js'
+import logRoutes from './routes/logs.js'
+import fs from 'fs'
 
-// for esm mode
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// load env
 dotenv.config()
+
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true })
+}
+const uploadsDir = path.join(DATA_DIR, 'uploads')
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true })
+}
+
+getDB()
 
 const app: express.Application = express()
 
@@ -26,14 +42,8 @@ app.use(cors())
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
-/**
- * API Routes
- */
 app.use('/api/auth', authRoutes)
 
-/**
- * health
- */
 app.use(
   '/api/health',
   (req: Request, res: Response, next: NextFunction): void => {
@@ -44,23 +54,29 @@ app.use(
   },
 )
 
-/**
- * error handler middleware
- */
+app.use(authMiddleware)
+
+app.use('/api/requirements', requirementRoutes)
+app.use('/api/inquiries', inquiryRoutes)
+app.use('/api/approvals', approvalRoutes)
+app.use('/api/contracts', contractRoutes)
+app.use('/api/acceptances', acceptanceRoutes)
+app.use('/api/payments', paymentRoutes)
+app.use('/api/suppliers', supplierRoutes)
+app.use('/api/reports', reportRoutes)
+app.use('/api', logRoutes)
+
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({
     success: false,
-    error: 'Server internal error',
+    message: error.message || '服务器内部错误',
   })
 })
 
-/**
- * 404 handler
- */
 app.use((req: Request, res: Response) => {
   res.status(404).json({
     success: false,
-    error: 'API not found',
+    message: 'API接口不存在',
   })
 })
 

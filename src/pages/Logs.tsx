@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Download, Search } from 'lucide-react'
-import { apiFetch } from '@/store'
+import { API_BASE, apiFetch, useAuthStore, useToastStore } from '@/store'
 
 interface LogEntry {
   id: string
@@ -11,42 +11,71 @@ interface LogEntry {
   detail: string
 }
 
-const mockData: LogEntry[] = [
-  { id: '1', timestamp: '2024-01-17 14:32:15', operator: '张三', action: '创建', target: '需求 XQ-2024-008', detail: '创建消防器材更换需求' },
-  { id: '2', timestamp: '2024-01-17 11:20:08', operator: '李四', action: '提交审批', target: '审批 SP-2024-005', detail: '提交付款申请FK-2024-007审批' },
-  { id: '3', timestamp: '2024-01-16 16:45:30', operator: '王五', action: '审批通过', target: '审批 SP-2024-003', detail: '空调设备采购审批通过' },
-  { id: '4', timestamp: '2024-01-16 09:15:22', operator: '赵六', action: '驳回', target: '审批 SP-2024-004', detail: '合同签署审批驳回，原因：关联交易未披露' },
-  { id: '5', timestamp: '2024-01-15 14:50:11', operator: '系统', action: '预警', target: '合同 HT-2024-015', detail: '合同即将到期，剩余15天' },
-  { id: '6', timestamp: '2024-01-15 10:30:45', operator: '张三', action: '发起询价', target: '询价 XJ-2024-006', detail: '音视频系统询价，邀请4家供应商' },
-  { id: '7', timestamp: '2024-01-14 15:22:18', operator: '系统', action: '自动评标', target: '询价 XJ-2024-002', detail: '实验室试剂询价自动评标完成，推荐：中联数码' },
-  { id: '8', timestamp: '2024-01-14 08:10:05', operator: '李四', action: '上传合同', target: '合同 HT-2024-002', detail: '上传线下合同文件' },
-]
-
-const actionTypes = ['全部', '创建', '提交审批', '审批通过', '驳回', '预警', '发起询价', '自动评标', '上传合同']
+const actionTypes = ['全部', '创建需求', '创建询价', '审批通过', '驳回', '生成预警', '发起询价', '自动评标', '上传合同', '创建合同', '签署合同', '完成验收', '处理付款', '用户登录']
 
 export default function Logs() {
-  const [data, setData] = useState<LogEntry[]>(mockData)
+  const token = useAuthStore((s) => s.token)
+  const showToast = useToastStore((s) => s.showToast)
+  const [data, setData] = useState<LogEntry[]>([])
   const [search, setSearch] = useState('')
   const [actionDate, setActionDate] = useState('')
   const [operatorFilter, setOperatorFilter] = useState('')
   const [actionType, setActionType] = useState('全部')
+  const [exporting, setExporting] = useState(false)
+
+  const fetchLogs = async () => {
+    try {
+      const params = new URLSearchParams()
+      if (search) params.append('target', search)
+      if (actionDate) params.append('date', actionDate)
+      if (operatorFilter) params.append('operator', operatorFilter)
+      if (actionType && actionType !== '全部') params.append('action', actionType)
+      const query = params.toString()
+      const url = `/logs${query ? `?${query}` : ''}`
+      const list: any[] = await apiFetch(url)
+      const mapped: LogEntry[] = list.map((l) => ({
+        id: l.id,
+        timestamp: l.timestamp.replace('T', ' ').slice(0, 19),
+        operator: l.operator_name,
+        action: l.action,
+        target: l.target_id ? `${l.target_type} ${l.target_id}` : l.target_type,
+        detail: l.detail,
+      }))
+      setData(mapped)
+    } catch (e: any) {
+      showToast(e.message || '获取日志失败', 'error')
+    }
+  }
 
   useEffect(() => {
-    apiFetch<LogEntry[]>('/logs').then(setData).catch(() => setData(mockData))
-  }, [])
-
-  const filtered = data.filter((r) => {
-    if (search && !r.target.includes(search) && !r.detail.includes(search)) return false
-    if (operatorFilter && !r.operator.includes(operatorFilter)) return false
-    if (actionType !== '全部' && r.action !== actionType) return false
-    if (actionDate && !r.timestamp.startsWith(actionDate)) return false
-    return true
-  })
+    fetchLogs()
+  }, [search, actionDate, operatorFilter, actionType])
 
   const operators = [...new Set(data.map((r) => r.operator))]
 
-  const handleExport = () => {
-    window.open('/api/logs/export', '_blank')
+  const handleExport = async () => {
+    setExporting(true)
+    try {
+      const params = new URLSearchParams()
+      if (actionDate) params.append('start', actionDate)
+      const query = params.toString()
+      const url = `${API_BASE}/reports/logs/export${query ? `?${query}` : ''}`
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) throw new Error('导出失败')
+      const blob = await res.blob()
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(blob)
+      a.download = `操作日志_${Date.now()}.csv`
+      a.click()
+      URL.revokeObjectURL(a.href)
+      showToast('导出成功', 'success')
+    } catch (e: any) {
+      showToast(e.message || '导出失败', 'error')
+    } finally {
+      setExporting(false)
+    }
   }
 
   return (
@@ -83,9 +112,9 @@ export default function Logs() {
           >
             {actionTypes.map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
-          <button onClick={handleExport} className="btn-secondary ml-auto">
+          <button onClick={handleExport} disabled={exporting} className="btn-secondary ml-auto disabled:opacity-50">
             <Download className="w-4 h-4" />
-            导出
+            {exporting ? '导出中...' : '导出'}
           </button>
         </div>
       </div>
@@ -102,7 +131,7 @@ export default function Logs() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {filtered.map((r) => (
+            {data.map((r) => (
               <tr key={r.id} className="hover:bg-gray-50/50 transition-colors">
                 <td className="px-4 py-3 text-xs font-mono text-gray-500 whitespace-nowrap">{r.timestamp}</td>
                 <td className="px-4 py-3 text-sm text-gray-900">{r.operator}</td>

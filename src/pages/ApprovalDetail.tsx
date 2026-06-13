@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, CheckCircle2, XCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import StatusBadge from '@/components/StatusBadge'
-import { apiFetch } from '@/store'
+import { apiFetch, useToastStore } from '@/store'
 
 interface ApprovalStep {
   step: number
@@ -46,24 +46,28 @@ const mockData: ApprovalDetail = {
 export default function ApprovalDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const showToast = useToastStore((s) => s.showToast)
   const [data, setData] = useState<ApprovalDetail>(mockData)
   const [comment, setComment] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     apiFetch<ApprovalDetail>(`/approvals/${id}`).then(setData).catch(() => {})
   }, [id])
 
   const handleAction = async (action: 'approved' | 'rejected') => {
+    setError('')
     setSubmitting(true)
     try {
       await apiFetch(`/approvals/${id}/action`, {
         method: 'POST',
         body: JSON.stringify({ action, comment }),
       })
-      navigate('/approvals')
-    } catch {
-      navigate('/approvals')
+      showToast(action === 'approved' ? '审批通过成功' : '已驳回审批', 'success')
+      setTimeout(() => navigate('/approvals'), 500)
+    } catch (err: any) {
+      setError(err.message || '操作失败')
     } finally {
       setSubmitting(false)
     }
@@ -139,6 +143,11 @@ export default function ApprovalDetail() {
             rows={3}
             className="w-full border border-gray-200 rounded-md p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
           />
+          {error && (
+            <div className="mt-3 p-3 bg-coral-50 text-coral-500 text-sm rounded-lg border border-coral-100">
+              {error}
+            </div>
+          )}
           <div className="flex items-center gap-3 mt-4">
             <button
               onClick={() => handleAction('approved')}
@@ -146,7 +155,7 @@ export default function ApprovalDetail() {
               className="inline-flex items-center gap-2 bg-emerald-400 text-white px-5 py-2 rounded-md text-sm font-medium hover:bg-emerald-500 transition-colors disabled:opacity-50"
             >
               <CheckCircle2 className="w-4 h-4" />
-              批准
+              {submitting ? '提交中...' : '批准'}
             </button>
             <button
               onClick={() => handleAction('rejected')}
@@ -154,7 +163,7 @@ export default function ApprovalDetail() {
               className="inline-flex items-center gap-2 bg-coral-400 text-white px-5 py-2 rounded-md text-sm font-medium hover:bg-coral-500 transition-colors disabled:opacity-50"
             >
               <XCircle className="w-4 h-4" />
-              驳回
+              {submitting ? '提交中...' : '驳回'}
             </button>
           </div>
         </div>

@@ -24,9 +24,17 @@ interface AuthState {
   user: User | null
   token: string | null
   isAuthenticated: boolean
+  loading: boolean
   login: (username: string, password: string) => Promise<void>
   logout: () => void
   setToken: (token: string) => void
+  loadUser: () => Promise<void>
+}
+
+interface ToastItem {
+  id: string
+  message: string
+  type: 'success' | 'error' | 'info'
 }
 
 interface NotificationState {
@@ -37,21 +45,46 @@ interface NotificationState {
   markAllAsRead: () => Promise<void>
 }
 
+interface ToastState {
+  toasts: ToastItem[]
+  showToast: (message: string, type?: 'success' | 'error' | 'info') => void
+  removeToast: (id: string) => void
+}
+
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const token = useAuthStore.getState().token
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
     ...(options?.headers as Record<string, string>),
+  }
+  if (!(options?.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json'
   }
   if (token) {
     headers['Authorization'] = `Bearer ${token}`
   }
   const res = await fetch(`${API_BASE}${path}`, { ...options, headers })
+  const contentType = res.headers.get('content-type')
   if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: res.statusText }))
-    throw new Error(error.message || `请求失败: ${res.status}`)
+    let message = `请求失败(${res.status})`
+    try {
+      if (contentType && contentType.includes('application/json')) {
+        const err = await res.json()
+        message = err.message || err.error || message
+      } else {
+        const text = await res.text()
+        message = text || message
+      }
+    } catch {}
+    throw new Error(message)
   }
-  return res.json()
+  if (contentType && (contentType.includes('application/pdf') || contentType.includes('text/csv') || contentType.includes('application/octet-stream'))) {
+    return res as unknown as T
+  }
+  const json = await res.json()
+  if (json && json.success && json.data !== undefined) {
+    return json.data as T
+  }
+  return json as T
 }
 
 export { apiFetch, API_BASE }
@@ -60,6 +93,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   token: localStorage.getItem('token'),
   isAuthenticated: !!localStorage.getItem('token'),
+  loading: false,
   login: async (username: string, password: string) => {
     const data = await apiFetch<{ token: string; user: User }>('/auth/login', {
       method: 'POST',
@@ -75,6 +109,21 @@ export const useAuthStore = create<AuthState>((set) => ({
   setToken: (token: string) => {
     localStorage.setItem('token', token)
     set({ token, isAuthenticated: true })
+  },
+  loadUser: async () => {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      set({ user: null, isAuthenticated: false, loading: false })
+      return
+    }
+    set({ loading: true })
+    try {
+      const user = await apiFetch<User>('/auth/me')
+      set({ user, isAuthenticated: true, loading: false })
+    } catch {
+      localStorage.removeItem('token')
+      set({ token: null, user: null, isAuthenticated: false, loading: false })
+    }
   },
 }))
 
@@ -117,5 +166,19 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     } catch {}
     const notifications = get().notifications.map((n) => ({ ...n, read: true }))
     set({ notifications, unreadCount: 0 })
+  },
+}))
+
+export const useToastStore = create<ToastState>((set) => ({
+  toasts: [],
+  showToast: (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    const id = Date.now().toString() + Math.random()
+    set((state) => ({ toasts: [...state.toasts, { id, message, type }] }))
+    setTimeout(() => {
+      set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) }))
+    }, 3000)
+  },
+  removeToast: (id: string) => {
+    set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) }))
   },
 }))

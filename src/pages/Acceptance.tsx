@@ -34,7 +34,7 @@ export default function Acceptance() {
   const [activeTab, setActiveTab] = useState('')
 
   useEffect(() => {
-    apiFetch<AcceptanceItem[]>('/acceptance').then(setData).catch(() => setData(mockData))
+    apiFetch<AcceptanceItem[]>('/acceptances').then(setData).catch(() => setData(mockData))
   }, [])
 
   const filtered = data.filter((r) => !activeTab || r.status === activeTab)

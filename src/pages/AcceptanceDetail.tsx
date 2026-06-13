@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, CheckCircle2, XCircle, CreditCard } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import StatusBadge from '@/components/StatusBadge'
-import { apiFetch } from '@/store'
+import { apiFetch, useToastStore } from '@/store'
 
 interface DeliveryItem {
   name: string
@@ -42,27 +42,40 @@ const mockData: AcceptanceDetail = {
 export default function AcceptanceDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const showToast = useToastStore((s) => s.showToast)
   const [data, setData] = useState<AcceptanceDetail>(mockData)
   const [showConfirm, setShowConfirm] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    apiFetch<AcceptanceDetail>(`/acceptance/${id}`).then(setData).catch(() => {})
+    apiFetch<AcceptanceDetail>(`/acceptances/${id}`).then(setData).catch(() => {})
   }, [id])
 
   const handleComplete = async () => {
+    setError('')
     setSubmitting(true)
     try {
-      await apiFetch(`/acceptance/${id}/complete`, { method: 'POST' })
-      navigate('/payments')
-    } catch {
-      navigate('/payments')
+      await apiFetch(`/acceptances/${id}/complete`, {
+        method: 'POST',
+        body: JSON.stringify({ accepted: true }),
+      })
+      showToast('验收已完成，已生成付款申请', 'success')
+      setShowConfirm(false)
+      try {
+        const updated = await apiFetch<AcceptanceDetail>(`/acceptances/${id}`)
+        setData(updated)
+      } catch {}
+      setTimeout(() => navigate('/payments'), 500)
+    } catch (err: any) {
+      setError(err.message || '操作失败')
     } finally {
       setSubmitting(false)
     }
   }
 
   const allMatch = data.deliveryItems.every((item) => item.match)
+  const canComplete = data.status === 'pending_acceptance' || data.status === 'pending'
 
   return (
     <div className="space-y-6">
@@ -119,9 +132,9 @@ export default function AcceptanceDetail() {
         </table>
       </div>
 
-      {data.status === 'pending_acceptance' && (
+      {canComplete && (
         <div className="flex items-center gap-3">
-          <button onClick={() => setShowConfirm(true)} className="btn-primary">
+          <button onClick={() => { setShowConfirm(true); setError('') }} className="btn-primary">
             <CreditCard className="w-4 h-4" />
             完成验收
           </button>
@@ -138,8 +151,13 @@ export default function AcceptanceDetail() {
             <p className="text-sm text-gray-500 mb-4">
               完成验收后将自动生成付款申请，合同 {data.contractId} 的待付款项将进入付款流程。
             </p>
+            {error && (
+              <div className="mb-4 p-3 bg-coral-50 text-coral-500 text-sm rounded-lg border border-coral-100">
+                {error}
+              </div>
+            )}
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowConfirm(false)} className="btn-secondary">取消</button>
+              <button onClick={() => setShowConfirm(false)} className="btn-secondary" disabled={submitting}>取消</button>
               <button onClick={handleComplete} disabled={submitting} className="btn-primary disabled:opacity-50">
                 {submitting ? '处理中...' : '确认完成'}
               </button>

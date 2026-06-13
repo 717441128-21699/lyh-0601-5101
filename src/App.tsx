@@ -1,6 +1,7 @@
+import { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Layout from '@/components/Layout'
-import { useAuthStore } from '@/store'
+import { useAuthStore, useToastStore } from '@/store'
 
 import Login from '@/pages/Login'
 import Dashboard from '@/pages/Dashboard'
@@ -22,14 +23,51 @@ import SupplierDetail from '@/pages/SupplierDetail'
 import Logs from '@/pages/Logs'
 import Alerts from '@/pages/Alerts'
 
+function ToastContainer() {
+  const { toasts, removeToast } = useToastStore()
+  return (
+    <div className="fixed top-4 right-4 z-[100] space-y-2">
+      {toasts.map((t) => (
+        <div
+          key={t.id}
+          onClick={() => removeToast(t.id)}
+          className={`px-4 py-3 rounded-lg shadow-lg text-sm cursor-pointer transition-all min-w-[240px] ${
+            t.type === 'success'
+              ? 'bg-emerald-400 text-white'
+              : t.type === 'error'
+              ? 'bg-coral-400 text-white'
+              : 'bg-primary-500 text-white'
+          }`}
+        >
+          {t.message}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function PrivateRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, loading } = useAuthStore()
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F8F9FB]">
+        <div className="text-primary-500">加载中...</div>
+      </div>
+    )
+  }
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />
 }
 
 export default function App() {
+  const loadUser = useAuthStore((s) => s.loadUser)
+
+  useEffect(() => {
+    loadUser()
+  }, [loadUser])
+
   return (
     <Router>
+      <ToastContainer />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route

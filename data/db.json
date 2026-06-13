@@ -1,0 +1,1228 @@
+{
+  "users": [
+    {
+      "id": "user-1",
+      "username": "admin",
+      "password": "admin123",
+      "name": "系统管理员",
+      "role": "admin",
+      "department": "系统部",
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "user-2",
+      "username": "manager",
+      "password": "manager123",
+      "name": "张经理",
+      "role": "manager",
+      "department": "采购部",
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "user-3",
+      "username": "procurement",
+      "password": "procurement123",
+      "name": "李专员",
+      "role": "procurement",
+      "department": "采购部",
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "user-4",
+      "username": "approver",
+      "password": "approver123",
+      "name": "王总监",
+      "role": "approver",
+      "department": "管理层",
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "user-5",
+      "username": "finance",
+      "password": "finance123",
+      "name": "赵财务",
+      "role": "finance",
+      "department": "财务部",
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "user-6",
+      "username": "director",
+      "password": "director123",
+      "name": "刘总",
+      "role": "approver",
+      "department": "管理层",
+      "created_at": "2026-06-13T19:24:11.839Z"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "XQ-2024-001",
+      "title": "办公电脑采购",
+      "department": "信息部",
+      "category": "电子设备",
+      "description": "为信息部及各部门采购办公用台式电脑",
+      "specifications": "[{\"name\":\"CPU\",\"value\":\"Intel i5\"},{\"name\":\"内存\",\"value\":\"16GB\"},{\"name\":\"硬盘\",\"value\":\"512GB SSD\"}]",
+      "budget": 150000,
+      "expected_delivery": "2024-02-20",
+      "status": "in_inquiry",
+      "source": "auto",
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "XQ-2024-002",
+      "title": "实验室试剂采购",
+      "department": "研发部",
+      "category": "实验耗材",
+      "description": "研发实验室常用化学试剂",
+      "specifications": "[{\"name\":\"纯度\",\"value\":\"分析纯\"},{\"name\":\"规格\",\"value\":\"500ml/瓶\"}]",
+      "budget": 80000,
+      "expected_delivery": "2024-02-15",
+      "status": "in_approval",
+      "source": "auto",
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "XQ-2024-003",
+      "title": "空调设备更换",
+      "department": "行政部",
+      "category": "机电设备",
+      "description": "办公楼老旧中央空调系统更换",
+      "specifications": "[{\"name\":\"制冷量\",\"value\":\"5匹\"},{\"name\":\"能效等级\",\"value\":\"一级\"}]",
+      "budget": 320000,
+      "expected_delivery": "2024-03-01",
+      "status": "contracted",
+      "source": "auto",
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "XQ-2024-004",
+      "title": "打印纸批量采购",
+      "department": "行政部",
+      "category": "办公用品",
+      "description": "季度办公打印纸采购",
+      "specifications": "[{\"name\":\"规格\",\"value\":\"A4\"},{\"name\":\"克重\",\"value\":\"70g\"}]",
+      "budget": 25000,
+      "expected_delivery": "2024-01-25",
+      "status": "completed",
+      "source": "auto",
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "XQ-2024-005",
+      "title": "网络安全设备升级",
+      "department": "信息部",
+      "category": "电子设备",
+      "description": "企业防火墙和入侵检测系统升级",
+      "specifications": "[{\"name\":\"吞吐量\",\"value\":\"10Gbps\"},{\"name\":\"并发连接\",\"value\":\"500万\"}]",
+      "budget": 500000,
+      "expected_delivery": "2024-03-15",
+      "status": "contracted",
+      "source": "auto",
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "XQ-2024-006",
+      "title": "员工工服定制",
+      "department": "人力资源部",
+      "category": "服装纺织",
+      "description": "新季度员工工作服定制",
+      "specifications": "[{\"name\":\"面料\",\"value\":\"棉质混纺\"},{\"name\":\"季节\",\"value\":\"春秋款\"}]",
+      "budget": 60000,
+      "expected_delivery": "2024-04-01",
+      "status": "in_inquiry",
+      "source": "auto",
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "XQ-2024-007",
+      "title": "会议室音视频系统",
+      "department": "行政部",
+      "category": "电子设备",
+      "description": "大型会议室音视频设备升级",
+      "specifications": "[{\"name\":\"投影\",\"value\":\"4K激光\"},{\"name\":\"音响\",\"value\":\"环绕立体声\"}]",
+      "budget": 200000,
+      "expected_delivery": "2024-03-20",
+      "status": "pending",
+      "source": "auto",
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "XQ-2024-008",
+      "title": "消防器材更换",
+      "department": "安全部",
+      "category": "安全设备",
+      "description": "全楼灭火器及消防器材更换",
+      "specifications": "[{\"name\":\"类型\",\"value\":\"干粉灭火器\"},{\"name\":\"规格\",\"value\":\"4kg/具\"}]",
+      "budget": 45000,
+      "expected_delivery": "2024-02-28",
+      "status": "pending",
+      "source": "auto",
+      "created_at": "2026-06-13T19:24:11.839Z"
+    }
+  ],
+  "suppliers": [
+    {
+      "id": "SP-001",
+      "name": "华信科技",
+      "categories": "[\"电子设备\",\"办公用品\"]",
+      "contact_person": "陈经理",
+      "phone": "13800138001",
+      "email": "chen@huaxin.com",
+      "on_time_rate": 92,
+      "quality_rate": 88,
+      "response_timeliness": 85,
+      "qualification_expiry": "2025-06-30",
+      "status": "active"
+    },
+    {
+      "id": "SP-002",
+      "name": "中联数码",
+      "categories": "[\"电子设备\",\"实验耗材\"]",
+      "contact_person": "刘经理",
+      "phone": "13800138002",
+      "email": "liu@zhonglian.com",
+      "on_time_rate": 88,
+      "quality_rate": 92,
+      "response_timeliness": 90,
+      "qualification_expiry": "2025-08-15",
+      "status": "active"
+    },
+    {
+      "id": "SP-003",
+      "name": "联想集团",
+      "categories": "[\"电子设备\"]",
+      "contact_person": "王经理",
+      "phone": "13800138003",
+      "email": "wang@lenovo.com",
+      "on_time_rate": 95,
+      "quality_rate": 95,
+      "response_timeliness": 80,
+      "qualification_expiry": "2026-01-20",
+      "status": "active"
+    },
+    {
+      "id": "SP-004",
+      "name": "得力文具",
+      "categories": "[\"办公用品\"]",
+      "contact_person": "赵经理",
+      "phone": "13800138004",
+      "email": "zhao@deli.com",
+      "on_time_rate": 98,
+      "quality_rate": 90,
+      "response_timeliness": 95,
+      "qualification_expiry": "2025-12-01",
+      "status": "active"
+    },
+    {
+      "id": "SP-005",
+      "name": "格力电器",
+      "categories": "[\"机电设备\"]",
+      "contact_person": "孙经理",
+      "phone": "13800138005",
+      "email": "sun@gree.com",
+      "on_time_rate": 85,
+      "quality_rate": 93,
+      "response_timeliness": 78,
+      "qualification_expiry": "2025-09-10",
+      "status": "active"
+    },
+    {
+      "id": "SP-006",
+      "name": "海康威视",
+      "categories": "[\"电子设备\",\"安全设备\"]",
+      "contact_person": "周经理",
+      "phone": "13800138006",
+      "email": "zhou@hikvision.com",
+      "on_time_rate": 90,
+      "quality_rate": 96,
+      "response_timeliness": 82,
+      "qualification_expiry": "2026-03-05",
+      "status": "active"
+    }
+  ],
+  "inquiries": [
+    {
+      "id": "XJ-2024-001",
+      "requirement_id": "XQ-2024-001",
+      "title": "办公电脑采购询价",
+      "category": "电子设备",
+      "deadline": "2024-02-10",
+      "status": "quoting",
+      "price_weight": 0.3,
+      "delivery_weight": 0.3,
+      "quality_weight": 0.4,
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "XJ-2024-002",
+      "requirement_id": "XQ-2024-002",
+      "title": "实验室试剂采购询价",
+      "category": "实验耗材",
+      "deadline": "2024-02-05",
+      "status": "evaluated",
+      "price_weight": 0.3,
+      "delivery_weight": 0.3,
+      "quality_weight": 0.4,
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "XJ-2024-003",
+      "requirement_id": "XQ-2024-003",
+      "title": "空调设备更换询价",
+      "category": "机电设备",
+      "deadline": "2024-02-15",
+      "status": "evaluated",
+      "price_weight": 0.3,
+      "delivery_weight": 0.3,
+      "quality_weight": 0.4,
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "XJ-2024-004",
+      "requirement_id": "XQ-2024-004",
+      "title": "打印纸批量采购询价",
+      "category": "办公用品",
+      "deadline": "2024-01-20",
+      "status": "closed",
+      "price_weight": 0.3,
+      "delivery_weight": 0.3,
+      "quality_weight": 0.4,
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "XJ-17813864449254635",
+      "requirement_id": "XQ-2024-006",
+      "title": "员工工服定制询价",
+      "category": "服装纺织",
+      "deadline": "2024-03-01",
+      "status": "quoting",
+      "price_weight": 0.3,
+      "delivery_weight": 0.3,
+      "quality_weight": 0.4,
+      "created_at": "2026-06-13T21:34:04.925Z"
+    }
+  ],
+  "inquiry_suppliers": [
+    {
+      "id": "qs-17813786518409810",
+      "inquiry_id": "XJ-2024-001",
+      "supplier_id": "SP-001",
+      "price": 145000,
+      "delivery_days": 15,
+      "quality_score": 85,
+      "service_score": 88,
+      "qualification_score": 90,
+      "composite_score": 0,
+      "status": "quoted",
+      "quoted_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "qs-17813786518403827",
+      "inquiry_id": "XJ-2024-001",
+      "supplier_id": "SP-002",
+      "price": 148000,
+      "delivery_days": 12,
+      "quality_score": 88,
+      "service_score": 85,
+      "qualification_score": 88,
+      "composite_score": 0,
+      "status": "quoted",
+      "quoted_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "qs-17813786518403784",
+      "inquiry_id": "XJ-2024-001",
+      "supplier_id": "SP-003",
+      "price": 152000,
+      "delivery_days": 10,
+      "quality_score": 95,
+      "service_score": 90,
+      "qualification_score": 95,
+      "composite_score": 0,
+      "status": "quoted",
+      "quoted_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "qs-17813786518402717",
+      "inquiry_id": "XJ-2024-001",
+      "supplier_id": "SP-006",
+      "price": 140000,
+      "delivery_days": 18,
+      "quality_score": 82,
+      "service_score": 80,
+      "qualification_score": 85,
+      "composite_score": 0,
+      "status": "pending",
+      "quoted_at": null
+    },
+    {
+      "id": "qs-17813786518406932",
+      "inquiry_id": "XJ-2024-002",
+      "supplier_id": "SP-002",
+      "price": 78000,
+      "delivery_days": 7,
+      "quality_score": 92,
+      "service_score": 90,
+      "qualification_score": 88,
+      "composite_score": 89.5,
+      "status": "evaluated",
+      "quoted_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "qs-17813786518406715",
+      "inquiry_id": "XJ-2024-002",
+      "supplier_id": "SP-001",
+      "price": 82000,
+      "delivery_days": 10,
+      "quality_score": 85,
+      "service_score": 88,
+      "qualification_score": 90,
+      "composite_score": 82.3,
+      "status": "evaluated",
+      "quoted_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "qs-17813786518404768",
+      "inquiry_id": "XJ-2024-003",
+      "supplier_id": "SP-005",
+      "price": 315000,
+      "delivery_days": 20,
+      "quality_score": 93,
+      "service_score": 85,
+      "qualification_score": 90,
+      "composite_score": 88.7,
+      "status": "evaluated",
+      "quoted_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "qs-17813786518402641",
+      "inquiry_id": "XJ-2024-003",
+      "supplier_id": "SP-001",
+      "price": 330000,
+      "delivery_days": 25,
+      "quality_score": 85,
+      "service_score": 88,
+      "qualification_score": 85,
+      "composite_score": 78.2,
+      "status": "evaluated",
+      "quoted_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "qs-17813786518403667",
+      "inquiry_id": "XJ-2024-004",
+      "supplier_id": "SP-004",
+      "price": 24500,
+      "delivery_days": 5,
+      "quality_score": 90,
+      "service_score": 95,
+      "qualification_score": 92,
+      "composite_score": 92.1,
+      "status": "awarded",
+      "quoted_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "qs-17813864449264836",
+      "inquiry_id": "XJ-17813864449254635",
+      "supplier_id": "SP-001",
+      "price": 0,
+      "delivery_days": 0,
+      "quality_score": 0,
+      "service_score": 0,
+      "qualification_score": 0,
+      "composite_score": 0,
+      "status": "pending",
+      "quoted_at": null
+    },
+    {
+      "id": "qs-17813864449275640",
+      "inquiry_id": "XJ-17813864449254635",
+      "supplier_id": "SP-004",
+      "price": 0,
+      "delivery_days": 0,
+      "quality_score": 0,
+      "service_score": 0,
+      "qualification_score": 0,
+      "composite_score": 0,
+      "status": "pending",
+      "quoted_at": null
+    }
+  ],
+  "approvals": [
+    {
+      "id": "SP-2024-001",
+      "type": "requirement",
+      "related_id": "XQ-2024-002",
+      "amount": 80000,
+      "required_level": "manager",
+      "current_step": 1,
+      "status": "pending",
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "SP-2024-002",
+      "type": "requirement",
+      "related_id": "XQ-2024-003",
+      "amount": 320000,
+      "required_level": "director",
+      "current_step": 2,
+      "status": "approved",
+      "created_at": "2026-06-13T19:24:11.839Z"
+    }
+  ],
+  "approval_steps": [
+    {
+      "id": "aps-17813786518406956",
+      "approval_id": "SP-2024-001",
+      "step": 1,
+      "role": "manager",
+      "approver_id": "user-2",
+      "approver_name": "张经理",
+      "status": "pending",
+      "comment": "",
+      "acted_at": null
+    },
+    {
+      "id": "aps-17813786518404846",
+      "approval_id": "SP-2024-002",
+      "step": 1,
+      "role": "manager",
+      "approver_id": "user-2",
+      "approver_name": "张经理",
+      "status": "approved",
+      "comment": "需求合理，同意上报",
+      "acted_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "aps-17813786518407770",
+      "approval_id": "SP-2024-002",
+      "step": 2,
+      "role": "director",
+      "approver_id": "user-6",
+      "approver_name": "刘总",
+      "status": "approved",
+      "comment": "同意，尽快实施",
+      "acted_at": "2026-06-13T19:24:11.839Z"
+    }
+  ],
+  "contracts": [
+    {
+      "id": "HT-2024-001",
+      "requirement_id": "XQ-2024-003",
+      "inquiry_id": "XJ-2024-003",
+      "supplier_id": "SP-005",
+      "supplier_name": "格力电器",
+      "amount": 320000,
+      "key_terms": "[\"设备到货后付款40%\",\"安装验收合格后付款40%\",\"质保期满无问题支付20%质保金\"]",
+      "compliance_passed": 3,
+      "compliance_failed": 0,
+      "compliance_details": "{\"budgetCheck\":\"pass\",\"qualificationCheck\":\"pass\",\"termsCheck\":\"pass\"}",
+      "budget_verified": true,
+      "qualification_verified": true,
+      "status": "active",
+      "is_offline": 0,
+      "file_name": null,
+      "signed_at": "2026-06-13T19:24:11.839Z",
+      "effective_from": "2024-02-01",
+      "effective_to": "2024-08-01",
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "HT-2024-002",
+      "requirement_id": "XQ-2024-004",
+      "inquiry_id": "XJ-2024-004",
+      "supplier_id": "SP-004",
+      "supplier_name": "得力文具",
+      "amount": 25000,
+      "key_terms": "[\"货到验收合格后一次性付款\"]",
+      "compliance_passed": 3,
+      "compliance_failed": 0,
+      "compliance_details": "{\"budgetCheck\":\"pass\",\"qualificationCheck\":\"pass\",\"termsCheck\":\"pass\"}",
+      "budget_verified": true,
+      "qualification_verified": true,
+      "status": "completed",
+      "is_offline": 0,
+      "file_name": null,
+      "signed_at": "2026-06-13T19:24:11.839Z",
+      "effective_from": "2024-01-15",
+      "effective_to": "2024-02-15",
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "HT-2024-003",
+      "requirement_id": "XQ-2024-005",
+      "inquiry_id": null,
+      "supplier_id": "SP-006",
+      "supplier_name": "海康威视",
+      "amount": 500000,
+      "key_terms": "[\"预付款30%\",\"到货验收后付款50%\",\"质保金20%\"]",
+      "compliance_passed": 2,
+      "compliance_failed": 1,
+      "compliance_details": "{\"budgetCheck\":\"pass\",\"qualificationCheck\":\"pass\",\"termsCheck\":\"warning\"}",
+      "budget_verified": true,
+      "qualification_verified": true,
+      "status": "active",
+      "is_offline": 0,
+      "file_name": null,
+      "signed_at": "2026-06-13T19:24:11.839Z",
+      "effective_from": "2024-02-10",
+      "effective_to": "2024-09-10",
+      "created_at": "2026-06-13T19:24:11.839Z"
+    }
+  ],
+  "payment_milestones": [
+    {
+      "id": "ms-17813786518409154",
+      "contract_id": "HT-2024-001",
+      "name": "预付款",
+      "amount": 128000,
+      "due_date": "2024-02-05",
+      "status": "paid"
+    },
+    {
+      "id": "ms-17813786518404949",
+      "contract_id": "HT-2024-001",
+      "name": "到货款",
+      "amount": 128000,
+      "due_date": "2024-02-25",
+      "status": "accepted"
+    },
+    {
+      "id": "ms-17813786518406891",
+      "contract_id": "HT-2024-001",
+      "name": "质保金",
+      "amount": 64000,
+      "due_date": "2024-08-01",
+      "status": "pending"
+    },
+    {
+      "id": "ms-17813786518405309",
+      "contract_id": "HT-2024-002",
+      "name": "全款",
+      "amount": 25000,
+      "due_date": "2024-01-25",
+      "status": "paid"
+    },
+    {
+      "id": "ms-17813786518409306",
+      "contract_id": "HT-2024-003",
+      "name": "预付款",
+      "amount": 150000,
+      "due_date": "2024-02-15",
+      "status": "paid"
+    },
+    {
+      "id": "ms-17813786518408380",
+      "contract_id": "HT-2024-003",
+      "name": "到货款",
+      "amount": 250000,
+      "due_date": "2024-03-20",
+      "status": "pending"
+    },
+    {
+      "id": "ms-17813786518402152",
+      "contract_id": "HT-2024-003",
+      "name": "质保金",
+      "amount": 100000,
+      "due_date": "2024-09-10",
+      "status": "pending"
+    }
+  ],
+  "acceptances": [
+    {
+      "id": "ys-17813786518406805",
+      "contract_id": "HT-2024-001",
+      "milestone_id": "ms-17813786518404949",
+      "delivery_items": "[{\"name\":\"中央空调主机\",\"qty\":2},{\"name\":\"末端风机\",\"qty\":15}]",
+      "status": "completed",
+      "accepted_at": "2026-06-13T19:24:11.839Z",
+      "payment_request_id": "fk-17813786518405459"
+    },
+    {
+      "id": "ys-17813786518401749",
+      "contract_id": "HT-2024-002",
+      "milestone_id": "ms-17813786518405309",
+      "delivery_items": "[{\"name\":\"A4打印纸\",\"qty\":500}]",
+      "status": "completed",
+      "accepted_at": "2026-06-13T19:24:11.839Z",
+      "payment_request_id": "fk-17813786518409908"
+    },
+    {
+      "id": "ys-17813786518409548",
+      "contract_id": "HT-2024-003",
+      "milestone_id": "ms-17813786518409306",
+      "delivery_items": "[{\"name\":\"企业防火墙\",\"qty\":2},{\"name\":\"入侵检测系统\",\"qty\":1}]",
+      "status": "completed",
+      "accepted_at": "2026-06-13T19:24:11.839Z",
+      "payment_request_id": "fk-17813786518403652"
+    }
+  ],
+  "payment_requests": [
+    {
+      "id": "fk-17813786518405459",
+      "contract_id": "HT-2024-001",
+      "acceptance_id": "ys-17813786518406805",
+      "amount": 128000,
+      "status": "pending",
+      "created_at": "2026-06-13T19:24:11.839Z",
+      "processed_at": null
+    },
+    {
+      "id": "fk-17813786518409908",
+      "contract_id": "HT-2024-002",
+      "acceptance_id": "ys-17813786518401749",
+      "amount": 25000,
+      "status": "processed",
+      "created_at": "2026-06-13T19:24:11.839Z",
+      "processed_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "fk-17813786518403652",
+      "contract_id": "HT-2024-003",
+      "acceptance_id": "ys-17813786518409548",
+      "amount": 150000,
+      "status": "processed",
+      "created_at": "2026-06-13T19:24:11.839Z",
+      "processed_at": "2026-06-13T19:24:11.839Z"
+    }
+  ],
+  "operation_logs": [
+    {
+      "id": "log-17813786518409600",
+      "operator_id": "user-3",
+      "operator_name": "李专员",
+      "action": "创建需求",
+      "target_type": "requirement",
+      "target_id": "XQ-2024-001",
+      "detail": "创建办公电脑采购需求",
+      "timestamp": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "log-17813786518406551",
+      "operator_id": "user-3",
+      "operator_name": "李专员",
+      "action": "创建询价",
+      "target_type": "inquiry",
+      "target_id": "XJ-2024-001",
+      "detail": "创建办公电脑采购询价单",
+      "timestamp": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "log-17813786518409460",
+      "operator_id": "user-2",
+      "operator_name": "张经理",
+      "action": "审批通过",
+      "target_type": "approval",
+      "target_id": "SP-2024-002",
+      "detail": "空调设备更换需求审批通过（一级）",
+      "timestamp": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "log-17813786518403717",
+      "operator_id": "user-6",
+      "operator_name": "刘总",
+      "action": "审批通过",
+      "target_type": "approval",
+      "target_id": "SP-2024-002",
+      "detail": "空调设备更换需求审批通过（终审）",
+      "timestamp": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "log-17813786518408051",
+      "operator_id": "user-3",
+      "operator_name": "李专员",
+      "action": "创建合同",
+      "target_type": "contract",
+      "target_id": "HT-2024-001",
+      "detail": "创建空调设备采购合同",
+      "timestamp": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "log-17813786518401731",
+      "operator_id": "user-4",
+      "operator_name": "王总监",
+      "action": "签署合同",
+      "target_type": "contract",
+      "target_id": "HT-2024-001",
+      "detail": "电子签署空调设备采购合同",
+      "timestamp": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "log-17813786518408613",
+      "operator_id": "user-3",
+      "operator_name": "李专员",
+      "action": "完成验收",
+      "target_type": "acceptance",
+      "target_id": "ys-17813786518406805",
+      "detail": "空调设备到货验收完成",
+      "timestamp": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "log-17813786518404451",
+      "operator_id": "user-5",
+      "operator_name": "赵财务",
+      "action": "处理付款",
+      "target_type": "payment",
+      "target_id": "fk-17813786518409908",
+      "detail": "打印纸采购款项已支付",
+      "timestamp": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "log-17813786518403452",
+      "operator_id": "system",
+      "operator_name": "系统",
+      "action": "生成预警",
+      "target_type": "alert",
+      "target_id": "",
+      "detail": "系统自动生成预警通知",
+      "timestamp": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "log-17813786518404940",
+      "operator_id": "user-1",
+      "operator_name": "系统管理员",
+      "action": "用户登录",
+      "target_type": "user",
+      "target_id": "user-1",
+      "detail": "系统管理员登录系统",
+      "timestamp": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "log-17813795349561066",
+      "operator_id": "user-1",
+      "operator_name": "系统管理员",
+      "action": "用户登录",
+      "target_type": "user",
+      "target_id": "user-1",
+      "detail": "系统管理员登录系统",
+      "timestamp": "2026-06-13T19:38:54.956Z"
+    },
+    {
+      "id": "log-17813797733968714",
+      "operator_id": "user-1",
+      "operator_name": "系统管理员",
+      "action": "用户登录",
+      "target_type": "user",
+      "target_id": "user-1",
+      "detail": "系统管理员登录系统",
+      "timestamp": "2026-06-13T19:42:53.396Z"
+    },
+    {
+      "id": "log-17813798158232936",
+      "operator_id": "user-1",
+      "operator_name": "系统管理员",
+      "action": "用户登录",
+      "target_type": "user",
+      "target_id": "user-1",
+      "detail": "系统管理员登录系统",
+      "timestamp": "2026-06-13T19:43:35.823Z"
+    },
+    {
+      "id": "log-17813858276193178",
+      "operator_id": "user-1",
+      "operator_name": "系统管理员",
+      "action": "用户登录",
+      "target_type": "user",
+      "target_id": "user-1",
+      "detail": "系统管理员登录系统",
+      "timestamp": "2026-06-13T21:23:47.619Z"
+    },
+    {
+      "id": "log-17813858746495401",
+      "operator_id": "user-1",
+      "operator_name": "系统管理员",
+      "action": "用户登录",
+      "target_type": "user",
+      "target_id": "user-1",
+      "detail": "系统管理员登录系统",
+      "timestamp": "2026-06-13T21:24:34.649Z"
+    },
+    {
+      "id": "log-17813860413957554",
+      "operator_id": "user-1",
+      "operator_name": "系统管理员",
+      "action": "用户登录",
+      "target_type": "user",
+      "target_id": "user-1",
+      "detail": "系统管理员登录系统",
+      "timestamp": "2026-06-13T21:27:21.395Z"
+    },
+    {
+      "id": "log-17813861783693218",
+      "operator_id": "user-1",
+      "operator_name": "系统管理员",
+      "action": "用户登录",
+      "target_type": "user",
+      "target_id": "user-1",
+      "detail": "系统管理员登录系统",
+      "timestamp": "2026-06-13T21:29:38.369Z"
+    },
+    {
+      "id": "log-17813862081447952",
+      "operator_id": "user-1",
+      "operator_name": "系统管理员",
+      "action": "用户登录",
+      "target_type": "user",
+      "target_id": "user-1",
+      "detail": "系统管理员登录系统",
+      "timestamp": "2026-06-13T21:30:08.144Z"
+    },
+    {
+      "id": "log-17813862340311540",
+      "operator_id": "user-1",
+      "operator_name": "系统管理员",
+      "action": "用户登录",
+      "target_type": "user",
+      "target_id": "user-1",
+      "detail": "系统管理员登录系统",
+      "timestamp": "2026-06-13T21:30:34.031Z"
+    },
+    {
+      "id": "log-17813863729999409",
+      "operator_id": "user-1",
+      "operator_name": "系统管理员",
+      "action": "用户登录",
+      "target_type": "user",
+      "target_id": "user-1",
+      "detail": "系统管理员登录系统",
+      "timestamp": "2026-06-13T21:32:52.999Z"
+    },
+    {
+      "id": "log-17813864448715641",
+      "operator_id": "user-3",
+      "operator_name": "李专员",
+      "action": "用户登录",
+      "target_type": "user",
+      "target_id": "user-3",
+      "detail": "李专员登录系统",
+      "timestamp": "2026-06-13T21:34:04.871Z"
+    },
+    {
+      "id": "log-17813864449284089",
+      "operator_id": "user-3",
+      "operator_name": "李专员",
+      "action": "创建询价",
+      "target_type": "inquiry",
+      "target_id": "XJ-17813864449254635",
+      "detail": "创建询价: 员工工服定制询价",
+      "timestamp": "2026-06-13T21:34:04.928Z"
+    }
+  ],
+  "alerts": [
+    {
+      "id": "alt-17813786518401670",
+      "type": "contract",
+      "severity": "critical",
+      "message": "合同HT-2024-015即将到期，请及时处理续约事宜",
+      "related_id": "HT-2024-001",
+      "is_read": 0,
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "alt-17813786518408840",
+      "type": "acceptance",
+      "severity": "critical",
+      "message": "验收单YS-2024-012超期未处理，请尽快完成验收",
+      "related_id": "",
+      "is_read": 0,
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "alt-17813786518402235",
+      "type": "inquiry",
+      "severity": "warning",
+      "message": "询价单XJ-2024-023报价即将截止，请注意跟进",
+      "related_id": "XJ-2024-001",
+      "is_read": 0,
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "alt-17813786518401449",
+      "type": "supplier",
+      "severity": "warning",
+      "message": "供应商SP-008资质即将过期，请提醒供应商更新",
+      "related_id": "SP-001",
+      "is_read": 1,
+      "created_at": "2026-06-13T19:24:11.839Z"
+    },
+    {
+      "id": "alt-17813786518409774",
+      "type": "payment",
+      "severity": "warning",
+      "message": "付款节点FK-2024-007已到期，请及时安排付款",
+      "related_id": "ms-17813786518409154",
+      "is_read": 1,
+      "created_at": "2026-06-13T19:24:11.839Z"
+    }
+  ],
+  "daily_statistics": [
+    {
+      "id": "ds-17813786518402615",
+      "date": "2026-06-07",
+      "avg_inquiry_response_hours": 40.19442280853064,
+      "avg_contract_signing_days": 5.5076640766903076,
+      "total_procurement_amount": 178040.44973089045,
+      "total_contracts": 6
+    },
+    {
+      "id": "ds-17813786518405713",
+      "date": "2026-06-08",
+      "avg_inquiry_response_hours": 46.44417298109938,
+      "avg_contract_signing_days": 4.577303167814727,
+      "total_procurement_amount": 151968.96999902057,
+      "total_contracts": 6
+    },
+    {
+      "id": "ds-17813786518407499",
+      "date": "2026-06-09",
+      "avg_inquiry_response_hours": 55.16614348916559,
+      "avg_contract_signing_days": 3.0484086855508292,
+      "total_procurement_amount": 245258.60547432536,
+      "total_contracts": 7
+    },
+    {
+      "id": "ds-17813786518403937",
+      "date": "2026-06-10",
+      "avg_inquiry_response_hours": 41.38137212265729,
+      "avg_contract_signing_days": 4.648420860810017,
+      "total_procurement_amount": 109441.9376057302,
+      "total_contracts": 7
+    },
+    {
+      "id": "ds-17813786518402277",
+      "date": "2026-06-11",
+      "avg_inquiry_response_hours": 55.24615580014526,
+      "avg_contract_signing_days": 4.975631229447271,
+      "total_procurement_amount": 116496.05023469843,
+      "total_contracts": 3
+    },
+    {
+      "id": "ds-17813786518401664",
+      "date": "2026-06-12",
+      "avg_inquiry_response_hours": 59.287973148072076,
+      "avg_contract_signing_days": 5.092924596680376,
+      "total_procurement_amount": 133081.94709320413,
+      "total_contracts": 6
+    },
+    {
+      "id": "ds-17813786518404182",
+      "date": "2026-06-13",
+      "avg_inquiry_response_hours": 46.10113096737768,
+      "avg_contract_signing_days": 4.3466074706122635,
+      "total_procurement_amount": 189190.25201793667,
+      "total_contracts": 4
+    }
+  ],
+  "department_statistics": [
+    {
+      "id": "dept-17813786518404217",
+      "statistic_id": "ds-17813786518402615",
+      "department": "采购部",
+      "execution_rate": 65.38076339154644
+    },
+    {
+      "id": "dept-17813786518402073",
+      "statistic_id": "ds-17813786518402615",
+      "department": "信息部",
+      "execution_rate": 63.32079584526529
+    },
+    {
+      "id": "dept-17813786518408508",
+      "statistic_id": "ds-17813786518402615",
+      "department": "研发部",
+      "execution_rate": 92.61723575880822
+    },
+    {
+      "id": "dept-17813786518408156",
+      "statistic_id": "ds-17813786518402615",
+      "department": "行政部",
+      "execution_rate": 80.45818557131409
+    },
+    {
+      "id": "dept-17813786518408136",
+      "statistic_id": "ds-17813786518402615",
+      "department": "财务部",
+      "execution_rate": 89.73564187776105
+    },
+    {
+      "id": "dept-17813786518405671",
+      "statistic_id": "ds-17813786518405713",
+      "department": "采购部",
+      "execution_rate": 71.02341699860122
+    },
+    {
+      "id": "dept-17813786518402588",
+      "statistic_id": "ds-17813786518405713",
+      "department": "信息部",
+      "execution_rate": 91.35209722093919
+    },
+    {
+      "id": "dept-17813786518405519",
+      "statistic_id": "ds-17813786518405713",
+      "department": "研发部",
+      "execution_rate": 62.6484103462178
+    },
+    {
+      "id": "dept-17813786518406163",
+      "statistic_id": "ds-17813786518405713",
+      "department": "行政部",
+      "execution_rate": 66.69179073095023
+    },
+    {
+      "id": "dept-17813786518401430",
+      "statistic_id": "ds-17813786518405713",
+      "department": "财务部",
+      "execution_rate": 90.0180723209398
+    },
+    {
+      "id": "dept-17813786518403418",
+      "statistic_id": "ds-17813786518407499",
+      "department": "采购部",
+      "execution_rate": 82.30366931300148
+    },
+    {
+      "id": "dept-17813786518405974",
+      "statistic_id": "ds-17813786518407499",
+      "department": "信息部",
+      "execution_rate": 84.08821244951554
+    },
+    {
+      "id": "dept-17813786518405193",
+      "statistic_id": "ds-17813786518407499",
+      "department": "研发部",
+      "execution_rate": 85.4909142366031
+    },
+    {
+      "id": "dept-17813786518402798",
+      "statistic_id": "ds-17813786518407499",
+      "department": "行政部",
+      "execution_rate": 79.0997779843043
+    },
+    {
+      "id": "dept-17813786518407551",
+      "statistic_id": "ds-17813786518407499",
+      "department": "财务部",
+      "execution_rate": 67.16142067438261
+    },
+    {
+      "id": "dept-17813786518401995",
+      "statistic_id": "ds-17813786518403937",
+      "department": "采购部",
+      "execution_rate": 87.07907111163163
+    },
+    {
+      "id": "dept-17813786518403142",
+      "statistic_id": "ds-17813786518403937",
+      "department": "信息部",
+      "execution_rate": 90.98429600200804
+    },
+    {
+      "id": "dept-17813786518407697",
+      "statistic_id": "ds-17813786518403937",
+      "department": "研发部",
+      "execution_rate": 60.27956818039552
+    },
+    {
+      "id": "dept-17813786518402809",
+      "statistic_id": "ds-17813786518403937",
+      "department": "行政部",
+      "execution_rate": 65.19646861608359
+    },
+    {
+      "id": "dept-17813786518408477",
+      "statistic_id": "ds-17813786518403937",
+      "department": "财务部",
+      "execution_rate": 90.45036387700151
+    },
+    {
+      "id": "dept-17813786518409713",
+      "statistic_id": "ds-17813786518402277",
+      "department": "采购部",
+      "execution_rate": 73.64903814984253
+    },
+    {
+      "id": "dept-17813786518403085",
+      "statistic_id": "ds-17813786518402277",
+      "department": "信息部",
+      "execution_rate": 69.05851050113023
+    },
+    {
+      "id": "dept-17813786518406825",
+      "statistic_id": "ds-17813786518402277",
+      "department": "研发部",
+      "execution_rate": 84.39105948227055
+    },
+    {
+      "id": "dept-17813786518409340",
+      "statistic_id": "ds-17813786518402277",
+      "department": "行政部",
+      "execution_rate": 79.15529416596776
+    },
+    {
+      "id": "dept-17813786518401833",
+      "statistic_id": "ds-17813786518402277",
+      "department": "财务部",
+      "execution_rate": 83.91432908541023
+    },
+    {
+      "id": "dept-17813786518402570",
+      "statistic_id": "ds-17813786518401664",
+      "department": "采购部",
+      "execution_rate": 88.75929637046937
+    },
+    {
+      "id": "dept-17813786518402799",
+      "statistic_id": "ds-17813786518401664",
+      "department": "信息部",
+      "execution_rate": 83.52511413013767
+    },
+    {
+      "id": "dept-17813786518409308",
+      "statistic_id": "ds-17813786518401664",
+      "department": "研发部",
+      "execution_rate": 85.11567400677666
+    },
+    {
+      "id": "dept-17813786518402110",
+      "statistic_id": "ds-17813786518401664",
+      "department": "行政部",
+      "execution_rate": 73.30737068785115
+    },
+    {
+      "id": "dept-17813786518408809",
+      "statistic_id": "ds-17813786518401664",
+      "department": "财务部",
+      "execution_rate": 89.7745316077146
+    },
+    {
+      "id": "dept-17813786518407610",
+      "statistic_id": "ds-17813786518404182",
+      "department": "采购部",
+      "execution_rate": 80.84970642549
+    },
+    {
+      "id": "dept-17813786518404588",
+      "statistic_id": "ds-17813786518404182",
+      "department": "信息部",
+      "execution_rate": 66.69506230623794
+    },
+    {
+      "id": "dept-17813786518405707",
+      "statistic_id": "ds-17813786518404182",
+      "department": "研发部",
+      "execution_rate": 77.17965214744521
+    },
+    {
+      "id": "dept-17813786518409306",
+      "statistic_id": "ds-17813786518404182",
+      "department": "行政部",
+      "execution_rate": 85.92939925846275
+    },
+    {
+      "id": "dept-17813786518404831",
+      "statistic_id": "ds-17813786518404182",
+      "department": "财务部",
+      "execution_rate": 94.03434523385008
+    }
+  ]
+}

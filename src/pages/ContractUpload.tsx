@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
-import { Upload, FileText, CheckCircle2, AlertCircle } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Upload, FileText, CheckCircle2, AlertCircle, Eye } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { apiFetch } from '@/store'
 
@@ -7,6 +8,7 @@ const ACCEPTED_FORMATS = ['.pdf', '.doc', '.docx', '.jpg', '.png']
 const MAX_SIZE = 20 * 1024 * 1024
 
 interface UploadedFile {
+  file: File
   name: string
   size: number
   valid: boolean
@@ -14,21 +16,26 @@ interface UploadedFile {
 }
 
 export default function ContractUpload() {
+  const navigate = useNavigate()
   const [files, setFiles] = useState<UploadedFile[]>([])
   const [dragging, setDragging] = useState(false)
   const [requirementId, setRequirementId] = useState('')
+  const [supplierName, setSupplierName] = useState('')
+  const [amount, setAmount] = useState('')
   const [uploading, setUploading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [newContractId, setNewContractId] = useState('')
+  const [error, setError] = useState('')
 
   const validateFile = (file: File): UploadedFile => {
     const ext = '.' + file.name.split('.').pop()?.toLowerCase()
     if (!ACCEPTED_FORMATS.includes(ext)) {
-      return { name: file.name, size: file.size, valid: false, error: '不支持的文件格式' }
+      return { file, name: file.name, size: file.size, valid: false, error: '不支持的文件格式' }
     }
     if (file.size > MAX_SIZE) {
-      return { name: file.name, size: file.size, valid: false, error: '文件超过20MB限制' }
+      return { file, name: file.name, size: file.size, valid: false, error: '文件超过20MB限制' }
     }
-    return { name: file.name, size: file.size, valid: true }
+    return { file, name: file.name, size: file.size, valid: true }
   }
 
   const handleFiles = (fileList: FileList | null) => {
@@ -45,14 +52,23 @@ export default function ContractUpload() {
 
   const handleSubmit = async () => {
     if (files.length === 0 || files.some((f) => !f.valid)) return
+    if (!supplierName.trim() || !amount) return
+    setError('')
     setUploading(true)
     try {
-      const formData = new FormData()
-      formData.append('requirementId', requirementId)
-      await apiFetch('/contracts/upload', { method: 'POST', body: JSON.stringify({ requirementId, files: files.map((f) => f.name) }) })
+      const fd = new FormData()
+      fd.append('file', files[0].file)
+      fd.append('requirementId', requirementId)
+      fd.append('supplierName', supplierName)
+      fd.append('amount', amount)
+      const result = await apiFetch<{ id: string }>('/contracts/upload', {
+        method: 'POST',
+        body: fd,
+      })
+      setNewContractId(result.id || '')
       setSuccess(true)
-    } catch {
-      setSuccess(true)
+    } catch (err: any) {
+      setError(err.message || '上传失败')
     } finally {
       setUploading(false)
     }
@@ -63,7 +79,21 @@ export default function ContractUpload() {
       <div className="flex flex-col items-center justify-center py-20">
         <CheckCircle2 className="w-16 h-16 text-emerald-400 mb-4" />
         <h2 className="text-xl font-semibold text-gray-900 mb-2">上传成功</h2>
-        <p className="text-sm text-gray-500">线下合同已成功上传，系统将自动进行合规校验</p>
+        <p className="text-sm text-gray-500 mb-6">线下合同已成功上传，系统将自动进行合规校验</p>
+        <div className="flex items-center gap-3">
+          {newContractId && (
+            <button
+              onClick={() => navigate(`/contracts/${newContractId}`)}
+              className="btn-primary inline-flex items-center gap-2"
+            >
+              <Eye className="w-4 h-4" />
+              查看合同
+            </button>
+          )}
+          <button onClick={() => navigate('/contracts')} className="btn-secondary">
+            返回合同列表
+          </button>
+        </div>
       </div>
     )
   }
@@ -80,6 +110,30 @@ export default function ContractUpload() {
           placeholder="请输入关联需求编号，如 XQ-2024-001"
           className="w-full max-w-md px-4 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
         />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="card">
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">供应商名称 <span className="text-coral-400">*</span></label>
+          <input
+            value={supplierName}
+            onChange={(e) => setSupplierName(e.target.value)}
+            placeholder="请输入供应商名称"
+            className="w-full px-4 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+            required
+          />
+        </div>
+        <div className="card">
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">合同金额(元) <span className="text-coral-400">*</span></label>
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="请输入合同金额"
+            className="w-full px-4 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+            required
+          />
+        </div>
       </div>
 
       <div className="card">
@@ -132,9 +186,15 @@ export default function ContractUpload() {
         </div>
       )}
 
+      {error && (
+        <div className="p-3 bg-coral-50 text-coral-500 text-sm rounded-lg border border-coral-100">
+          {error}
+        </div>
+      )}
+
       <button
         onClick={handleSubmit}
-        disabled={files.length === 0 || files.some((f) => !f.valid) || uploading}
+        disabled={files.length === 0 || files.some((f) => !f.valid) || uploading || !supplierName.trim() || !amount}
         className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {uploading ? '上传中...' : '提交上传'}
