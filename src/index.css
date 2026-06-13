@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #1E3A5F;
+  --color-gold: #D4A843;
+  --color-emerald: #2D9B83;
+  --color-coral: #E05C5C;
+  --color-bg: #F8F9FB;
+  font-family: 'Noto Sans SC', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: #1a1a2e;
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-lg shadow-sm border border-gray-100 p-5;
+  }
+  .badge-pending {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700;
+  }
+  .badge-active {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700;
+  }
+  .badge-warning {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700;
+  }
+  .badge-info {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700;
+  }
+  .btn-primary {
+    @apply bg-primary-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary-600 transition-colors duration-150 inline-flex items-center gap-2;
+  }
+  .btn-secondary {
+    @apply border border-primary-500 text-primary-500 px-4 py-2 rounded-md text-sm font-medium hover:bg-primary-50 transition-colors duration-150 inline-flex items-center gap-2;
+  }
+  .btn-gold {
+    @apply bg-gold-400 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gold-500 transition-colors duration-150 inline-flex items-center gap-2;
+  }
+  .stat-card {
+    @apply bg-white rounded-lg shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow duration-200;
+  }
+}
