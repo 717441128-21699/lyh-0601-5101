@@ -13,6 +13,15 @@ interface TimelineItem {
   comment: string
 }
 
+interface AmountBreakdownItem {
+  name: string
+  spec: string
+  orderedQty: number
+  actualQty: number
+  unitPrice: number
+  subtotal: number
+}
+
 interface PaymentDetail {
   id: string
   requestNo: string
@@ -34,6 +43,7 @@ interface PaymentDetail {
   contract: any
   milestone: any
   timeline: TimelineItem[]
+  amountBreakdown: AmountBreakdownItem[]
 }
 
 const statusLabels: Record<string, { label: string; color: string }> = {
@@ -67,6 +77,14 @@ function mapPaymentDetail(pr: any): PaymentDetail {
     timeline: (pr.timeline || []).map((t: any) => ({
       ...t,
       time: t.time ? t.time.replace('T', ' ').slice(0, 16) : '',
+    })),
+    amountBreakdown: (pr.amount_breakdown || []).map((b: any) => ({
+      name: b.name,
+      spec: b.spec,
+      orderedQty: Number(b.ordered_qty || 0),
+      actualQty: Number(b.actual_qty || 0),
+      unitPrice: Number(b.unit_price || 0),
+      subtotal: Number(b.subtotal || 0),
     })),
   }
 }
@@ -238,6 +256,53 @@ export default function PaymentDetail() {
           </div>
         )}
       </div>
+
+      {detail.amountBreakdown && detail.amountBreakdown.length > 0 && (
+        <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden mb-6">
+          <div className="p-6 border-b border-neutral-100">
+            <h2 className="text-lg font-semibold text-neutral-900">金额计算明细</h2>
+            <p className="text-sm text-neutral-500 mt-1">本次付款金额按实际到货数量计算</p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-neutral-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">交付项</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">规格型号</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider">合同数量</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider">本次到货</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider">单价</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider">小计</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neutral-100">
+                {detail.amountBreakdown.map((item, idx) => (
+                  <tr key={idx} className="hover:bg-neutral-50">
+                    <td className="px-6 py-4 text-sm text-neutral-900">{item.name}</td>
+                    <td className="px-6 py-4 text-sm text-neutral-500">{item.spec}</td>
+                    <td className="px-6 py-4 text-sm text-neutral-700 text-right">{item.orderedQty}</td>
+                    <td className="px-6 py-4 text-sm text-right">
+                      <span className={item.actualQty < item.orderedQty ? 'text-amber-600 font-medium' : 'text-emerald-600 font-medium'}>
+                        {item.actualQty}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-neutral-700 text-right">¥{item.unitPrice.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-sm text-neutral-900 font-medium text-right">¥{item.subtotal.toLocaleString()}</td>
+                  </tr>
+                ))}
+                <tr className="bg-primary-50 font-semibold">
+                  <td colSpan={5} className="px-6 py-4 text-right text-neutral-900">
+                    本次申请付款金额
+                  </td>
+                  <td className="px-6 py-4 text-right text-primary-600 text-lg">
+                    ¥{detail.amount.toLocaleString()}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden mb-6">
         <div className="p-6 border-b border-neutral-100">

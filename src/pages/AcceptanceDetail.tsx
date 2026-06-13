@@ -42,6 +42,7 @@ interface AcceptanceDetail {
   acceptedAt: string
   batchNo: number
   comment: string
+  canAddBatch: boolean
 }
 
 const mockData: AcceptanceDetail = {
@@ -61,6 +62,7 @@ const mockData: AcceptanceDetail = {
   acceptedAt: '',
   batchNo: 0,
   comment: '',
+  canAddBatch: false,
 }
 
 function mapAcceptanceStatus(s: string): string {
@@ -144,6 +146,7 @@ export default function AcceptanceDetail() {
           acceptedAt: raw.accepted_at ? raw.accepted_at.replace('T', ' ').slice(0, 16) : '',
           batchNo: raw.batch_no || 0,
           comment: raw.comment || '',
+          canAddBatch: raw.can_add_batch || false,
         }
         setData(mapped)
         if (raw.status !== 'completed') {
@@ -195,6 +198,7 @@ export default function AcceptanceDetail() {
         acceptedAt: raw.accepted_at ? raw.accepted_at.replace('T', ' ').slice(0, 16) : '',
         batchNo: raw.batch_no || 0,
         comment: raw.comment || '',
+        canAddBatch: raw.can_add_batch || false,
       }
       setData(mapped)
       if (raw.status !== 'completed') {
@@ -258,7 +262,7 @@ export default function AcceptanceDetail() {
   const allMatch = batchDeliveryItems.every((item) => item.match || item.ordered_qty === 0)
   const hasActualQty = batchDeliveryItems.some((item) => item.actual_qty > 0)
   const canComplete = data.status === 'pending_acceptance' || data.status === 'pending'
-  const canAddBatch = data.status === 'accepted' && data.deliveryList.some((d) => d.remaining_qty > 0)
+  const canAddBatch = data.canAddBatch || (data.status === 'accepted' && data.deliveryList.some((d) => d.remaining_qty > 0))
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">

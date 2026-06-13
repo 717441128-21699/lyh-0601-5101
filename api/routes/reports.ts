@@ -51,40 +51,62 @@ router.get('/statistics', async (req: any, res: Response): Promise<void> => {
       date: d.date,
       hours: Math.round(d.avg_inquiry_response_hours * 10) / 10
     }))
-    const cycleSeed = Math.floor(Math.random() * 3)
-    const cycleDistribution = [
-      { range: '< 3天', count: 3 + cycleSeed },
-      { range: '3-7天', count: 5 + ((cycleSeed + 1) % 4) },
-      { range: '7-15天', count: 2 + ((cycleSeed + 2) % 3) },
-      { range: '> 15天', count: 1 + (cycleSeed % 2) }
-    ]
-    const totalAmount = dailyStats.reduce((sum: number, d: any) => sum + d.total_procurement_amount, 0)
-    const totalContracts = dailyStats.reduce((sum: number, d: any) => sum + d.total_contracts, 0)
-    const avgCycle = dailyStats.length > 0
-      ? Math.round((dailyStats.reduce((sum: number, d: any) => sum + d.avg_contract_signing_days, 0) / dailyStats.length) * 10) / 10
-      : 0
-    const avgResponse = dailyStats.length > 0
-      ? Math.round((dailyStats.reduce((sum: number, d: any) => sum + d.avg_inquiry_response_hours, 0) / dailyStats.length) * 10) / 10
-      : 0
-    const avgExec = latestDept.length > 0
-      ? Math.round((latestDept.reduce((sum: number, d: any) => sum + d.execution_rate, 0) / latestDept.length) * 100) / 100
-      : 0
     const allContracts = query('contracts')
-    const activeContracts = allContracts.filter((c: any) => c.status === 'active').length
-    const complianceRate = allContracts.length > 0
-      ? Math.round((allContracts.filter((c: any) => Number(c.compliance_failed || 0) === 0).length / allContracts.length) * 100) / 100
+    let filteredContracts = allContracts
+    if (start) {
+      filteredContracts = filteredContracts.filter((c: any) => (c.created_at || '').slice(0, 10) >= start)
+    }
+    if (end) {
+      filteredContracts = filteredContracts.filter((c: any) => (c.created_at || '').slice(0, 10) <= end)
+    }
+    if (filteredContracts.length === 0) filteredContracts = allContracts
+    
+    let cycleBuckets = [
+      { range: '< 3天', min: 0, max: 3, count: 0 },
+      { range: '3-7天', min: 3, max: 7, count: 0 },
+      { range: '7-15天', min: 7, max: 15, count: 0 },
+      { range: '> 15天', min: 15, max: 9999, count: 0 },
+    ]
+    filteredContracts.forEach((c: any) => {
+      const created = new Date(c.created_at || new Date())
+      const signed = new Date(c.signed_at || c.effective_from || new Date())
+      const days = Math.max(0, Math.ceil((signed.getTime() - created.getTime()) / (1000 * 60 * 60 * 24)))
+      const bucket = cycleBuckets.find((b) => days >= b.min && days < b.max)
+      if (bucket) bucket.count++
+    })
+    const cycleDistribution = cycleBuckets.map((b) => ({ range: b.range, count: b.count }))
+    
+    const activeContracts = filteredContracts.filter((c: any) => c.status === 'active').length
+    const complianceRate = filteredContracts.length > 0
+      ? Math.round((filteredContracts.filter((c: any) => Number(c.compliance_failed || 0) === 0).length / filteredContracts.length) * 100) / 100
       : 0
     const inquiries = query('inquiries')
     const overdueRate = inquiries.length > 0
       ? Math.round((inquiries.filter((i: any) => i.status === 'expired').length / inquiries.length) * 100) / 100
       : 0
+    
+    const totalAmountFromContracts = filteredContracts.reduce((sum: number, c: any) => sum + Number(c.amount || 0), 0)
+    const totalContractsCount = filteredContracts.length
+    const avgCycleFromContracts = filteredContracts.length > 0
+      ? Math.round(filteredContracts.reduce((sum: number, c: any) => {
+          const created = new Date(c.created_at || new Date())
+          const signed = new Date(c.signed_at || c.effective_from || new Date())
+          const days = Math.max(0, Math.ceil((signed.getTime() - created.getTime()) / (1000 * 60 * 60 * 24)))
+          return sum + days
+        }, 0) / filteredContracts.length * 10) / 10
+      : 0
+    
     const metrics = {
-      total_procurement_amount: totalAmount,
-      total_contracts: totalContracts,
-      avg_contract_signing_days: avgCycle,
+      total_procurement_amount: totalAmountFromContracts,
+      total_contracts: totalContractsCount,
+      avg_contract_signing_days: avgCycleFromContracts,
       active_contracts: activeContracts,
-      avg_response_hours: avgResponse,
-      avg_execution_rate: avgExec,
+      avg_response_hours: dailyStats.length > 0
+        ? Math.round((dailyStats.reduce((sum: number, d: any) => sum + d.avg_inquiry_response_hours, 0) / dailyStats.length) * 10) / 10
+        : 0,
+      avg_execution_rate: latestDept.length > 0
+        ? Math.round((latestDept.reduce((sum: number, d: any) => sum + d.execution_rate, 0) / latestDept.length) * 100) / 100
+        : 0,
       compliance_rate: complianceRate,
       overdue_rate: overdueRate,
     }

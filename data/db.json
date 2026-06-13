@@ -633,7 +633,8 @@
       "id": "ys-17813786518406805",
       "contract_id": "HT-2024-001",
       "milestone_id": "ms-17813786518404949",
-      "delivery_items": "[{\"name\":\"中央空调主机\",\"qty\":2},{\"name\":\"末端风机\",\"qty\":15}]",
+      "delivery_items": "[{\"name\":\"中央空调主机\",\"spec\":\"格力 GMV-H120WL/A\",\"ordered_qty\":2,\"actual_qty\":2,\"match\":true},{\"name\":\"末端风机盘管\",\"spec\":\"格力 FP-68\",\"ordered_qty\":15,\"actual_qty\":15,\"match\":true},{\"name\":\"安装辅材\",\"spec\":\"铜管/电线/保温\",\"ordered_qty\":1,\"actual_qty\":1,\"match\":true}]",
+      "batch_no": 1,
       "status": "completed",
       "accepted_at": "2026-06-13T19:24:11.839Z",
       "payment_request_id": "fk-17813786518405459"
@@ -642,7 +643,8 @@
       "id": "ys-17813786518401749",
       "contract_id": "HT-2024-002",
       "milestone_id": "ms-17813786518405309",
-      "delivery_items": "[{\"name\":\"A4打印纸\",\"qty\":500}]",
+      "delivery_items": "[{\"name\":\"A4复印纸\",\"spec\":\"得力 70g 500张/包\",\"ordered_qty\":500,\"actual_qty\":500,\"match\":true},{\"name\":\"A3复印纸\",\"spec\":\"得力 70g 500张/包\",\"ordered_qty\":100,\"actual_qty\":100,\"match\":true}]",
+      "batch_no": 1,
       "status": "completed",
       "accepted_at": "2026-06-13T19:24:11.839Z",
       "payment_request_id": "fk-17813786518409908"
@@ -651,7 +653,8 @@
       "id": "ys-17813786518409548",
       "contract_id": "HT-2024-003",
       "milestone_id": "ms-17813786518409306",
-      "delivery_items": "[{\"name\":\"企业防火墙\",\"qty\":2},{\"name\":\"入侵检测系统\",\"qty\":1}]",
+      "delivery_items": "[{\"name\":\"企业防火墙\",\"spec\":\"华为 USG6305E\",\"ordered_qty\":2,\"actual_qty\":1,\"match\":false},{\"name\":\"入侵检测系统\",\"spec\":\"华为 NIP6305\",\"ordered_qty\":1,\"actual_qty\":0,\"match\":false}]",
+      "batch_no": 1,
       "status": "completed",
       "accepted_at": "2026-06-13T19:24:11.839Z",
       "payment_request_id": "fk-17813786518403652"
@@ -662,8 +665,11 @@
       "id": "fk-17813786518405459",
       "contract_id": "HT-2024-001",
       "acceptance_id": "ys-17813786518406805",
+      "milestone_id": "ms-17813786518404949",
       "amount": 128000,
       "status": "paid",
+      "comment": "第1批次验收完成，货物已全部送达",
+      "amount_breakdown": "[{\"name\":\"中央空调主机\",\"spec\":\"格力 GMV-H120WL/A\",\"ordered_qty\":2,\"actual_qty\":2,\"unit_price\":71111.11,\"subtotal\":142222.22},{\"name\":\"末端风机盘管\",\"spec\":\"格力 FP-68\",\"ordered_qty\":15,\"actual_qty\":15,\"unit_price\":71111.11,\"subtotal\":1066666.65},{\"name\":\"安装辅材\",\"spec\":\"铜管/电线/保温\",\"ordered_qty\":1,\"actual_qty\":1,\"unit_price\":71111.11,\"subtotal\":71111.11}]",
       "created_at": "2026-06-13T19:24:11.839Z",
       "processed_at": "2026-06-13T22:18:06.884Z",
       "processed_by": "赵财务",
@@ -673,19 +679,29 @@
       "id": "fk-17813786518409908",
       "contract_id": "HT-2024-002",
       "acceptance_id": "ys-17813786518401749",
+      "milestone_id": "ms-17813786518405309",
       "amount": 25000,
-      "status": "processed",
+      "status": "paid",
+      "comment": "第1批次验收完成，货物已全部送达",
+      "amount_breakdown": "[{\"name\":\"A4复印纸\",\"spec\":\"得力 70g 500张/包\",\"ordered_qty\":500,\"actual_qty\":500,\"unit_price\":83.33,\"subtotal\":41665},{\"name\":\"A3复印纸\",\"spec\":\"得力 70g 500张/包\",\"ordered_qty\":100,\"actual_qty\":100,\"unit_price\":83.33,\"subtotal\":8333}]",
       "created_at": "2026-06-13T19:24:11.839Z",
-      "processed_at": "2026-06-13T19:24:11.839Z"
+      "processed_at": "2026-06-13T19:24:11.839Z",
+      "processed_by": "赵财务",
+      "processed_comment": "已完成支付"
     },
     {
       "id": "fk-17813786518403652",
       "contract_id": "HT-2024-003",
       "acceptance_id": "ys-17813786518409548",
-      "amount": 150000,
-      "status": "processed",
+      "milestone_id": "ms-17813786518409306",
+      "amount": 100000,
+      "status": "pending",
+      "comment": "第1批次验收完成，仅到货1台企业防火墙，剩余1台和入侵检测系统待后续批次到货",
+      "amount_breakdown": "[{\"name\":\"企业防火墙\",\"spec\":\"华为 USG6305E\",\"ordered_qty\":2,\"actual_qty\":1,\"unit_price\":100000,\"subtotal\":100000},{\"name\":\"入侵检测系统\",\"spec\":\"华为 NIP6305\",\"ordered_qty\":1,\"actual_qty\":0,\"unit_price\":100000,\"subtotal\":0}]",
       "created_at": "2026-06-13T19:24:11.839Z",
-      "processed_at": "2026-06-13T19:24:11.839Z"
+      "processed_at": null,
+      "processed_by": null,
+      "processed_comment": null
     }
   ],
   "operation_logs": [

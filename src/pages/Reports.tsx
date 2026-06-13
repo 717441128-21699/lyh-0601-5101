@@ -91,7 +91,7 @@ const PIE_COLORS = ['#1E3A5F', '#D4A843', '#2D9B83', '#E05C5C', '#8B5CF6', '#F97
 export default function Reports() {
   const token = useAuthStore((s) => s.token)
   const showToast = useToastStore((s) => s.showToast)
-  const [dateRange, setDateRange] = useState({ start: '2024-07-01', end: '2024-12-31' })
+  const [dateRange, setDateRange] = useState({ start: '2026-06-07', end: '2026-06-13' })
   const [stats, setStats] = useState<Statistics>({})
   const [exporting, setExporting] = useState<string | null>(null)
   const [activeDimension, setActiveDimension] = useState<'contract' | 'supplier' | 'month'>('contract')

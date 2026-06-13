@@ -50,6 +50,16 @@ router.get('/:id', async (req: any, res: Response): Promise<void> => {
     const contract = findOne('contracts', (c: any) => c.id === pr.contract_id)
     const milestone = findOne('payment_milestones', (m: any) => m.id === pr.milestone_id)
     const acceptance = findOne('acceptances', (a: any) => a.id === pr.acceptance_id)
+    
+    let amountBreakdown: any[] = []
+    if (pr.amount_breakdown) {
+      try {
+        amountBreakdown = typeof pr.amount_breakdown === 'string' ? JSON.parse(pr.amount_breakdown) : pr.amount_breakdown
+      } catch {
+        amountBreakdown = []
+      }
+    }
+    
     const timeline: any[] = [
       {
         type: 'submit',
@@ -97,6 +107,7 @@ router.get('/:id', async (req: any, res: Response): Promise<void> => {
       contract,
       milestone,
       timeline,
+      amount_breakdown: amountBreakdown,
     }
     res.status(200).json({ success: true, data: result })
   } catch (err: any) {

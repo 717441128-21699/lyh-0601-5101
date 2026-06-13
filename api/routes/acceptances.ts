@@ -11,6 +11,38 @@ function parseItems(a: any) {
   return r
 }
 
+function calculatePaymentAmount(
+  itemsWithMatch: any[],
+  contract: any,
+  milestone: any,
+  deliveryList: any[]
+): { amount: number; breakdown: any[] } {
+  const totalOrderedQty = deliveryList.reduce((sum: number, d: any) => sum + Number(d.qty || 0), 0)
+  const contractAmount = Number(contract?.amount || 0)
+  const unitPrice = totalOrderedQty > 0 ? contractAmount / totalOrderedQty : 0
+
+  const breakdown = itemsWithMatch.map((it: any) => {
+    const actualQty = Number(it.actual_qty || 0)
+    const price = unitPrice * actualQty
+    return {
+      name: it.name,
+      spec: it.spec,
+      ordered_qty: Number(it.ordered_qty || 0),
+      actual_qty: actualQty,
+      unit_price: Math.round(unitPrice * 100) / 100,
+      subtotal: Math.round(price * 100) / 100,
+    }
+  })
+
+  const totalAmount = breakdown.reduce((sum: number, b: any) => sum + b.subtotal, 0)
+  const finalAmount = milestone?.amount ? Math.min(totalAmount, Number(milestone.amount)) : totalAmount
+
+  return {
+    amount: Math.round(finalAmount),
+    breakdown,
+  }
+}
+
 function buildContractDeliveryList(contract: any): any[] {
   if (!contract) return []
   const sampleDeliveries: Record<string, any[]> = {
@@ -92,8 +124,10 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
     const deliveryWithStats = deliveryList.map((item) => ({
       ...item,
       accepted_qty: acceptedTotals[item.name] || 0,
-      remaining_qty: Number(item.qty) - (acceptedTotals[item.name] || 0),
+      remaining_qty: Math.max(0, Number(item.qty) - (acceptedTotals[item.name] || 0)),
     }))
+    const totalRemaining = deliveryWithStats.reduce((sum: number, it: any) => sum + it.remaining_qty, 0)
+    const canAddBatch = a.status === 'completed' && totalRemaining > 0
     res.status(200).json({
       success: true,
       data: {
@@ -104,6 +138,7 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
         history,
         delivery_list: deliveryWithStats,
         next_batch_no: history.length + 1,
+        can_add_batch: canAddBatch,
       },
     })
   } catch (err: any) {
@@ -162,24 +197,25 @@ router.post('/:id/add-batch', async (req: any, res: Response): Promise<void> => 
     }
     const prId = generateId('fk')
     const milestone = findOne('payment_milestones', (m: any) => m.id === milestoneId)
-    const totalAmount = itemsWithMatch.reduce((sum: number, it: any) => sum + (Number(it.actual_qty) * (Number(contract?.amount) / Number(deliveryList[0]?.qty || 1) / 10 || Number(milestone?.amount) / itemsWithMatch.length || 0)), 0);
+    const { amount, breakdown } = calculatePaymentAmount(itemsWithMatch, contract, milestone, deliveryList)
     insert('payment_requests', {
       id: prId,
       contract_id: existing.contract_id,
       acceptance_id: acceptanceId,
       milestone_id: milestoneId,
-      amount: Math.round(totalAmount) || (milestone?.amount || 0),
+      amount: amount,
       status: 'pending',
       comment: comment || '',
+      amount_breakdown: JSON.stringify(breakdown),
       created_at: now,
       processed_at: null,
       processed_by: null,
       processed_comment: null,
     })
     update('acceptances', acceptanceId, { payment_request_id: prId })
-    if (req.user) log(req.user.id, req.user.name, '完成验收批次', 'acceptance', acceptanceId, `第${batchNo}批次验收：${comment || ''}`)
+    if (req.user) log(req.user.id, req.user.name, '完成验收批次', 'acceptance', acceptanceId, `第${batchNo}批次验收：${comment || ''}，付款金额¥${amount}`)
     const updated = findOne('acceptances', (x: any) => x.id === acceptanceId)
-    res.status(200).json({ success: true, data: parseItems(updated), payment_request_id: prId })
+    res.status(200).json({ success: true, data: parseItems(updated), payment_request_id: prId, payment_amount: amount })
   } catch (err: any) {
     res.status(500).json({ success: false, message: err.message || '添加验收批次失败' })
   }
@@ -222,23 +258,25 @@ router.post('/:id/complete', async (req: any, res: Response): Promise<void> => {
     }
     const prId = generateId('fk')
     const milestone = findOne('payment_milestones', (m: any) => m.id === acceptance.milestone_id)
+    const { amount, breakdown } = calculatePaymentAmount(itemsWithMatch, contract, milestone, deliveryList)
     insert('payment_requests', {
       id: prId,
       contract_id: acceptance.contract_id,
       acceptance_id: id,
       milestone_id: acceptance.milestone_id,
-      amount: milestone?.amount || 0,
+      amount: amount,
       status: 'pending',
       comment: comment || '',
+      amount_breakdown: JSON.stringify(breakdown),
       created_at: now,
       processed_at: null,
       processed_by: null,
       processed_comment: null,
     })
     update('acceptances', id, { payment_request_id: prId })
-    if (req.user) log(req.user.id, req.user.name, '完成验收', 'acceptance', id, `第${batchNo}批次：${comment || '验收完成'}`)
+    if (req.user) log(req.user.id, req.user.name, '完成验收', 'acceptance', id, `第${batchNo}批次：${comment || '验收完成'}，付款金额¥${amount}`)
     const updated = findOne('acceptances', (x: any) => x.id === id)
-    res.status(200).json({ success: true, data: parseItems(updated), payment_request_id: prId })
+    res.status(200).json({ success: true, data: parseItems(updated), payment_request_id: prId, payment_amount: amount })
   } catch (err: any) {
     res.status(500).json({ success: false, message: err.message || '处理验收失败' })
   }
