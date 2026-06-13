@@ -17,6 +17,7 @@ import ContractUpload from '@/pages/ContractUpload'
 import Acceptance from '@/pages/Acceptance'
 import AcceptanceDetail from '@/pages/AcceptanceDetail'
 import Payments from '@/pages/Payments'
+import PaymentDetail from '@/pages/PaymentDetail'
 import Reports from '@/pages/Reports'
 import Suppliers from '@/pages/Suppliers'
 import SupplierDetail from '@/pages/SupplierDetail'
@@ -90,6 +91,7 @@ export default function App() {
           <Route path="/acceptance" element={<Acceptance />} />
           <Route path="/acceptance/:id" element={<AcceptanceDetail />} />
           <Route path="/payments" element={<Payments />} />
+          <Route path="/payments/:id" element={<PaymentDetail />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/suppliers" element={<Suppliers />} />
           <Route path="/suppliers/:id" element={<SupplierDetail />} />

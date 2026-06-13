@@ -585,7 +585,7 @@
       "name": "到货款",
       "amount": 128000,
       "due_date": "2024-02-25",
-      "status": "accepted"
+      "status": "paid"
     },
     {
       "id": "ms-17813786518406891",
@@ -663,9 +663,11 @@
       "contract_id": "HT-2024-001",
       "acceptance_id": "ys-17813786518406805",
       "amount": 128000,
-      "status": "pending",
+      "status": "paid",
       "created_at": "2026-06-13T19:24:11.839Z",
-      "processed_at": null
+      "processed_at": "2026-06-13T22:18:06.884Z",
+      "processed_by": "赵财务",
+      "processed_comment": "已完成支付，流水号20240613001"
     },
     {
       "id": "fk-17813786518409908",
@@ -916,6 +918,26 @@
       "target_id": "user-2",
       "detail": "张经理登录系统",
       "timestamp": "2026-06-13T21:52:57.465Z"
+    },
+    {
+      "id": "log-17813890378809080",
+      "operator_id": "user-5",
+      "operator_name": "赵财务",
+      "action": "用户登录",
+      "target_type": "user",
+      "target_id": "user-5",
+      "detail": "赵财务登录系统",
+      "timestamp": "2026-06-13T22:17:17.880Z"
+    },
+    {
+      "id": "log-17813890868861617",
+      "operator_id": "user-5",
+      "operator_name": "赵财务",
+      "action": "处理付款",
+      "target_type": "payment",
+      "target_id": "fk-17813786518405459",
+      "detail": "支付付款申请 fk-17813786518405459：已完成支付，流水号20240613001",
+      "timestamp": "2026-06-13T22:18:06.886Z"
     }
   ],
   "alerts": [

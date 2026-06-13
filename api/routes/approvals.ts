@@ -5,7 +5,23 @@ const router = Router()
 
 router.get('/', async (req: any, res: Response): Promise<void> => {
   try {
-    const approvals = query('approvals')
+    const { type, min_amount, max_amount, current_step, status, submitted_by } = req.query
+    let approvals = query('approvals')
+    if (type && type !== 'all') {
+      approvals = approvals.filter((a: any) => a.type === type)
+    }
+    if (min_amount) {
+      approvals = approvals.filter((a: any) => Number(a.amount) >= Number(min_amount))
+    }
+    if (max_amount) {
+      approvals = approvals.filter((a: any) => Number(a.amount) <= Number(max_amount))
+    }
+    if (current_step && current_step !== 'all') {
+      approvals = approvals.filter((a: any) => String(a.current_step) === String(current_step))
+    }
+    if (status && status !== 'all') {
+      approvals = approvals.filter((a: any) => a.status === status)
+    }
     const steps = query('approval_steps')
     const result = approvals.map((a: any) => ({
       ...a,

@@ -26,18 +26,30 @@ const statusMap: Record<string, { label: string; className: string }> = {
   critical: { label: '严重', className: 'bg-red-50 text-red-700' },
 }
 
+const colorMap: Record<string, string> = {
+  success: 'bg-green-50 text-green-700',
+  danger: 'bg-red-50 text-red-700',
+  warning: 'bg-yellow-50 text-yellow-700',
+  info: 'bg-blue-50 text-blue-700',
+  default: 'bg-gray-50 text-gray-600',
+  primary: 'bg-primary-50 text-primary-700',
+  gold: 'bg-amber-50 text-amber-700',
+}
+
 interface StatusBadgeProps {
   status: string
   className?: string
+  color?: string
 }
 
-export default function StatusBadge({ status, className }: StatusBadgeProps) {
-  const config = statusMap[status] || { label: status, className: 'bg-gray-50 text-gray-600' }
+export default function StatusBadge({ status, className, color }: StatusBadgeProps) {
+  const config = statusMap[status] || { label: status, className: color ? colorMap[color] || 'bg-gray-50 text-gray-600' : 'bg-gray-50 text-gray-600' }
+  const colorClass = color ? colorMap[color] : config.className
   return (
     <span
       className={cn(
         'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-        config.className,
+        colorClass,
         className
       )}
     >

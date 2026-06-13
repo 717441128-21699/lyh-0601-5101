@@ -204,4 +204,167 @@ router.get('/logs/export', async (req: any, res: Response): Promise<void> => {
   }
 })
 
+router.get('/drilldown', async (req: any, res: Response): Promise<void> => {
+  try {
+    const { dimension, range, start, end } = req.query
+    let contracts = query('contracts')
+    const dailyStats = query('daily_statistics').sort((a: any, b: any) => a.date.localeCompare(b.date))
+    let filteredDaily = dailyStats
+    if (start) filteredDaily = filteredDaily.filter((d: any) => d.date >= start)
+    if (end) filteredDaily = filteredDaily.filter((d: any) => d.date <= end)
+    if (filteredDaily.length === 0) filteredDaily = dailyStats
+    const firstDate = filteredDaily[0]?.date
+    const lastDate = filteredDaily[filteredDaily.length - 1]?.date
+    const dateFilter: Record<string, boolean> = {}
+    filteredDaily.forEach((d: any) => { dateFilter[d.date] = true })
+    const requirements = query('requirements', (r: any) => {
+      const d = (r.created_at || '').slice(0, 10)
+      return !start || d >= start
+    })
+    const inquiries = query('inquiries')
+    const milestones = query('payment_milestones')
+    const paymentRequests = query('payment_requests')
+    if (start) {
+      contracts = contracts.filter((c: any) => (c.created_at || '').slice(0, 10) >= start)
+    }
+    if (end) {
+      contracts = contracts.filter((c: any) => (c.created_at || '').slice(0, 10) <= end)
+    }
+    let cycleDistribution = [
+      { range: '< 3天', min: 0, max: 3, count: 0 },
+      { range: '3-7天', min: 3, max: 7, count: 0 },
+      { range: '7-15天', min: 7, max: 15, count: 0 },
+      { range: '> 15天', min: 15, max: 9999, count: 0 },
+    ]
+    contracts.forEach((c: any) => {
+      const created = new Date(c.created_at || c.signed_at || new Date())
+      const signed = new Date(c.signed_at || c.effective_from || new Date())
+      const days = Math.max(0, Math.ceil((signed.getTime() - created.getTime()) / (1000 * 60 * 60 * 24)))
+      const bucket = cycleDistribution.find((b) => days >= b.min && days < b.max)
+      if (bucket) bucket.count++
+    })
+    if (dimension === 'contract' || !dimension) {
+      const contractsExtended = contracts.map((c: any) => {
+        const contractRequirements = requirements.filter((r: any) => r.id === c.related_requirement_id)
+        const contractInquiries = inquiries.filter((i: any) => i.related_requirement_id === c.related_requirement_id)
+        const contractMilestones = milestones.filter((m: any) => m.contract_id === c.id)
+        const contractPayments = paymentRequests.filter((pr: any) => pr.contract_id === c.id)
+        const paidAmount = contractPayments.filter((pr: any) => pr.status === 'paid' || pr.status === 'processed').reduce((s: number, p: any) => s + Number(p.amount), 0)
+        return {
+          id: c.id,
+          supplier_name: c.supplier_name,
+          amount: Number(c.amount),
+          status: c.status,
+          created_at: c.created_at,
+          effective_from: c.effective_from,
+          paid_amount: paidAmount,
+          remaining_amount: Number(c.amount) - paidAmount,
+          milestone_count: contractMilestones.length,
+          payment_count: contractPayments.length,
+          compliance_passed: Number(c.compliance_passed || 0),
+          compliance_failed: Number(c.compliance_failed || 0),
+          requirement_id: contractRequirements[0]?.id,
+          inquiry_id: contractInquiries[0]?.id,
+        }
+      })
+      let targetList = contractsExtended
+      if (range) {
+        const bucket = cycleDistribution.find((b) => b.range === range)
+        if (bucket) {
+          targetList = contractsExtended.filter((c: any) => {
+            const created = new Date(c.created_at || new Date())
+            const signed = new Date(c.effective_from || new Date())
+            const days = Math.ceil((signed.getTime() - created.getTime()) / (1000 * 60 * 60 * 24))
+            return days >= bucket.min && days < bucket.max
+          })
+        }
+      }
+      res.status(200).json({
+        success: true,
+        data: {
+          dimension: 'contract',
+          range: range || null,
+          date_range: { start: start || null, end: end || null, firstDate, lastDate },
+          total_count: targetList.length,
+          total_amount: targetList.reduce((s: number, c: any) => s + c.amount, 0),
+          total_paid: targetList.reduce((s: number, c: any) => s + c.paid_amount, 0),
+          items: targetList,
+          cycle_distribution: cycleDistribution,
+        },
+      })
+      return
+    }
+    if (dimension === 'supplier') {
+      const supplierMap: Record<string, any> = {}
+      contracts.forEach((c: any) => {
+        const key = c.supplier_name
+        if (!supplierMap[key]) {
+          supplierMap[key] = {
+            supplier_name: key,
+            contract_count: 0,
+            total_amount: 0,
+            paid_amount: 0,
+            contracts: [] as string[],
+          }
+        }
+        const contractPayments = paymentRequests.filter((pr: any) => pr.contract_id === c.id)
+        const paidAmount = contractPayments.filter((pr: any) => pr.status === 'paid' || pr.status === 'processed').reduce((s: number, p: any) => s + Number(p.amount), 0)
+        supplierMap[key].contract_count++
+        supplierMap[key].total_amount += Number(c.amount)
+        supplierMap[key].paid_amount += paidAmount
+        supplierMap[key].contracts.push(c.id)
+      })
+      const supplierList = Object.values(supplierMap).map((s: any) => ({
+        ...s,
+        remaining_amount: s.total_amount - s.paid_amount,
+        avg_contract_value: s.contract_count > 0 ? Math.round(s.total_amount / s.contract_count) : 0,
+      }))
+      res.status(200).json({
+        success: true,
+        data: {
+          dimension: 'supplier',
+          range: range || null,
+          date_range: { start: start || null, end: end || null, firstDate, lastDate },
+          total_count: supplierList.length,
+          total_amount: supplierList.reduce((s: number, c: any) => s + c.total_amount, 0),
+          total_paid: supplierList.reduce((s: number, c: any) => s + c.paid_amount, 0),
+          items: supplierList,
+          cycle_distribution: cycleDistribution,
+        },
+      })
+      return
+    }
+    if (dimension === 'month') {
+      const monthMap: Record<string, any> = {}
+      contracts.forEach((c: any) => {
+        const month = (c.created_at || '').slice(0, 7)
+        if (!month) return
+        if (!monthMap[month]) {
+          monthMap[month] = { month, contract_count: 0, total_amount: 0, contracts: [] as string[] }
+        }
+        monthMap[month].contract_count++
+        monthMap[month].total_amount += Number(c.amount)
+        monthMap[month].contracts.push(c.id)
+      })
+      const monthList = Object.values(monthMap).sort((a: any, b: any) => a.month.localeCompare(b.month))
+      res.status(200).json({
+        success: true,
+        data: {
+          dimension: 'month',
+          range: range || null,
+          date_range: { start: start || null, end: end || null, firstDate, lastDate },
+          total_count: monthList.reduce((s: number, c: any) => s + c.contract_count, 0),
+          total_amount: monthList.reduce((s: number, c: any) => s + c.total_amount, 0),
+          items: monthList,
+          cycle_distribution: cycleDistribution,
+        },
+      })
+      return
+    }
+    res.status(400).json({ success: false, message: `不支持的维度: ${dimension}` })
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message || '获取钻取数据失败' })
+  }
+})
+
 export default router
